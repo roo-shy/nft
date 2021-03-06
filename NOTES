@@ -1,0 +1,4 @@
+NOTES:
+
+1- truffle compile -reset
+2- truffle migrate
