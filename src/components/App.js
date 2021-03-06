@@ -12,7 +12,7 @@ class App extends Component {
     this.state={
       account:'',
       contract: null,
-      totalSupply: 0,
+      totalSupply: 1,
       colors: []
     }
   }
@@ -55,10 +55,10 @@ class App extends Component {
       // const returnContract = new web3.eth.Contract(abi);
       this.setState({ contract:returnContract })//sets it in state obj
       // console.log("contractName:",returnContract.contractName);
-      // console.log("contractName:",this.state.contract.contractName);
+      console.log("contract:",this.state.contract);
 
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
-      console.log("supply",returntotalSupply)
+      console.log("supply",this.state.totalSupply)
       this.setState({ totalSupply:returntotalSupply }) //sets state var
       // Load Colors
       for (var i = 1; i <= returntotalSupply; i++) {
@@ -100,7 +100,7 @@ class App extends Component {
 
   mint = (color) => {
     this.state.contract.mint(color)
-    .send({from: this.state.account})
+    .call({from: this.state.account})
     .once('receipt',
        (receipt) => {
           this.setState(

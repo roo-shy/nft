@@ -1,4 +1,15 @@
 NOTES:
-
+0 - start ganache connect with MM
 1- truffle compile -reset
 2- truffle migrate
+3-npm run start
+
+truffle version
+
+https://docs.soliditylang.org/en/v0.7.4/
+
+https://docs.openzeppelin.com/contracts/3.x/erc721#Presets
+
+metamask : piperlarf
+dwarf tornado crisp script neck deal initial rapid stomach rotate patch ticket
+Chain ID should be 1337.
