@@ -1,7 +1,7 @@
 NOTES:
 0 - start ganache connect with MM
-1- truffle compile -reset
-2- truffle migrate
+1- truffle compile -all
+2- truffle migrate --reset
 3-npm run start
 
 truffle version

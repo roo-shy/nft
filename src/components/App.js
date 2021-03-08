@@ -55,9 +55,17 @@ class App extends Component {
       // const returnContract = new web3.eth.Contract(abi);
       this.setState({ contract:returnContract })//sets it in state obj
       // console.log("contractName:",returnContract.contractName);
-      console.log("contract:",this.state.contract);
-
+      console.log("contract:",this.state.contract)
+      console.log("calling mint")
+      returnContract.methods.mint("#ff42ff").call({from: this.state.account})
+      console.log("calling totalssupply")
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
+const junk= await returnContract.methods.getjunk().call()
+console.log("junk ",junk.toString())
+const mintreturn= await returnContract.methods.mint("poop").call()
+console.log("mintreturn ",mintreturn)
+
+      console.log("returntotalsupply",returntotalSupply.toString())
       console.log("supply",this.state.totalSupply)
       this.setState({ totalSupply:returntotalSupply }) //sets state var
       // Load Colors
@@ -97,20 +105,32 @@ class App extends Component {
 //         }
 //     )
 //   }
-
-  mint = (color) => {
-    this.state.contract.mint(color)
-    .call({from: this.state.account})
-    .once('receipt',
-       (receipt) => {
-          this.setState(
-            {
-            colors: [...this.state.colors, color]
-            }
-          )
-        }
-    )
-  }
+mint = (color) => {
+  this.state.contract.methods.mint(color)
+  .call({from: this.state.account})
+  // .on('receipt',
+  //    (receipt) => {
+  //       this.setState(
+  //         {
+  //         colors: [...this.state.colors, color]
+  //         }
+  //       )
+  //     }
+  // )
+}
+  // mint = (color) => {
+  //   this.state.contract.mint(color)
+  //   .call({from: this.state.account})
+  //   .once('receipt',
+  //      (receipt) => {
+  //         this.setState(
+  //           {
+  //           colors: [...this.state.colors, color]
+  //           }
+  //         )
+  //       }
+  //   )
+  // }
 render() {
   return (
     <div>
