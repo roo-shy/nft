@@ -21,11 +21,18 @@ class App extends Component {
       console.log("loadWeb3");
 
     if (window.ethereum) {
-      window.web3 = new Web3(window.ethereum)
+            console.log("loadWeb3  ETH");
+
+      // window.web3 = new Web3(window.ethereum)
+            window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
+
       await window.ethereum.enable()
     }
     else if (window.web3) {
-      window.web3 = new Web3(window.web3.currentProvider)
+                  console.log("loadWeb3  WEB3");
+
+      // window.web3 = new Web3(window.web3.currentProvider)
+      window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
     }
     else {
       window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
@@ -76,6 +83,12 @@ class App extends Component {
       console.log("returntotalsupply",returntotalSupply.toString())
       console.log("state total supply",this.state.totalSupply)
       this.setState({ totalSupply:returntotalSupply }) //sets state var
+
+      returnContract.events.Transfer()
+      .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
+      .on('error',console.error);
+
+
       // Load Colors
       for (var i = 1; i <= returntotalSupply; i++) {
         const color = await returnContract.methods.colors(i - 1).call()
@@ -115,9 +128,10 @@ class App extends Component {
 //   }
 mint = (color) => {
   this.state.contract.methods.mint(color)
-  .send({from: this.state.account})
+  .send({from: this.state.account, gas:3000000 })//gas must be set with each call for Ganche-cli
   .on('receipt',
      (receipt) => {
+      // console.log("got mints receipt")
         this.setState(
           {
           colors: [...this.state.colors, color]
