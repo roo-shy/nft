@@ -16,10 +16,10 @@ contract Color is ERC721 {
       return junk;
     }
   
-  // function mint(string memory _color) public returns(string memory) {
-  //   _mint(msg.sender, 1);
-  //   return _color;
-  // }
+  function testReturn(string memory _color) public returns(string memory) {
+    // _mint(msg.sender, 1);
+    return _color;
+  }
 
 function mint(string memory _color) public {
   require(!_colorExists[_color]);

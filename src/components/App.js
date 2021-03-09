@@ -33,16 +33,23 @@ class App extends Component {
   }
 
   async componentWillMount() {
+    console.log("loadingWeb3")
     await this.loadWeb3()
+    console.log("loadBlockchainData")
     await this.loadBlockchainData()
   }
   async loadBlockchainData() {
+    console.log("A")
     const web3 = window.web3
     // Load account
     const accounts = await web3.eth.getAccounts() //gets accout from metamask
     this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
+        // console.log("B",accounts[0])
     const networkId = await web3.eth.net.getId() //detercts the eth network 
+        // console.log("C",networkId)
     const networkData = Color.networks[networkId] //gets the contracts address on the network
+        // console.log("D")
+    console.log("netowrkdata",networkId)
     if(networkData) {//if it has an addres
       const abi = Color.abi //creates a JS version of the contract with its abi
       const address = networkData.address //its actual address?
@@ -56,17 +63,18 @@ class App extends Component {
       this.setState({ contract:returnContract })//sets it in state obj
       // console.log("contractName:",returnContract.contractName);
       console.log("contract:",this.state.contract)
-      console.log("calling mint")
-      returnContract.methods.mint("#ff42ff").call({from: this.state.account})
+      console.log("calling test return")
+      const testreturn=returnContract.methods.testReturn("this is a test").call({from: this.state.account})
+      console.log("testreturn ",testreturn)
       console.log("calling totalssupply")
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
-const junk= await returnContract.methods.getjunk().call()
-console.log("junk ",junk.toString())
-const mintreturn= await returnContract.methods.mint("poop").call()
-console.log("mintreturn ",mintreturn)
+// const junk= await returnContract.methods.getjunk().call()
+// console.log("junk ",junk)
+// const mintreturn= await returnContract.methods.mint("poop").call()
+// console.log("mintreturn ",mintreturn)
 
       console.log("returntotalsupply",returntotalSupply.toString())
-      console.log("supply",this.state.totalSupply)
+      console.log("state total supply",this.state.totalSupply)
       this.setState({ totalSupply:returntotalSupply }) //sets state var
       // Load Colors
       for (var i = 1; i <= returntotalSupply; i++) {
@@ -107,16 +115,16 @@ console.log("mintreturn ",mintreturn)
 //   }
 mint = (color) => {
   this.state.contract.methods.mint(color)
-  .call({from: this.state.account})
-  // .on('receipt',
-  //    (receipt) => {
-  //       this.setState(
-  //         {
-  //         colors: [...this.state.colors, color]
-  //         }
-  //       )
-  //     }
-  // )
+  .send({from: this.state.account})
+  .on('receipt',
+     (receipt) => {
+        this.setState(
+          {
+          colors: [...this.state.colors, color]
+          }
+        )
+      }
+  )
 }
   // mint = (color) => {
   //   this.state.contract.mint(color)
