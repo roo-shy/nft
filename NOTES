@@ -3,6 +3,7 @@ NOTES:
 1- truffle compile -all
 2- truffle migrate --reset
 3-npm run start
+ganache-cli -i 5777 -g 100
 
 truffle version
 
@@ -11,6 +12,10 @@ https://docs.soliditylang.org/en/v0.7.4/
 https://docs.openzeppelin.com/contracts/3.x/erc721#Presets
 
 https://www.dappuniversity.com/articles/blockchain-programming
+
+https://manojpramesh.github.io/solidity-cheatsheet/
+
+https://github.com/simondlr/neolastics
 
 
 metamask : piperlarf
@@ -23,4 +28,7 @@ Truffle v5.2.2 (core: 5.2.2)
 Solidity - 0.7.4 (solc-js)
 Node v12.17.0
 Web3.js v1.2.9
+
+https://github.com/trufflesuite/ganache-cli/blob/master/README.md
+npm install -g ganache-cli
 

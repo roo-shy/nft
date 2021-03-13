@@ -1,11 +1,15 @@
 require('babel-register');
 require('babel-polyfill');
 
+//gas is gas limit
+// gasPrice is the price
+
 module.exports = {
   networks: {
     development: {
       websockets: true,
-      // host: "192.168.1.187",
+ gas: 500000000,  // gas limit
+ gasPrice: 1,
       host: "127.0.0.1",
       port: 8545,
       network_id: "5777" // Match any network id
