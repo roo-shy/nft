@@ -46,7 +46,7 @@ class App extends Component {
     await this.loadBlockchainData()
   }
   async loadBlockchainData() {
-    console.log("A")
+    // console.log("A")
     const web3 = window.web3
     // Load account
     const accounts = await web3.eth.getAccounts() //gets accout from metamask
@@ -88,6 +88,13 @@ class App extends Component {
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
       .on('error',console.error);
 
+      returnContract.getPastEvents('PixelChanged', {
+          fromBlock: 0,
+          toBlock: 'latest'
+      }, function(error, events){ console.log(events); })
+      .then(function(events){
+          console.log(events) // same results as the optional callback above
+      });
 
       // Load Colors
       for (var i = 1; i <= returntotalSupply; i++) {
