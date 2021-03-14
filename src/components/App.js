@@ -83,6 +83,13 @@ class App extends Component {
 
       // this.setState({svg:"<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/></svg>"})
       console.log("SVG: ",this.state.svg)
+
+
+      returnContract.events.SVGgenerated()
+      .on('data', (event) => {
+        console.log("SVG EVENT ",event);
+      })
+      .on('error', console.error)
 // const junk= await returnContract.methods.getjunk().call()
 // console.log("junk ",junk)
 // const mintreturn= await returnContract.methods.mint("poop").call()
@@ -103,13 +110,22 @@ class App extends Component {
       .then(function(events){
           console.log(events) // same results as the optional callback above
       });
+
+
       returnContract.getPastEvents('SVGgenerated', {
           fromBlock: 0,
           toBlock: 'latest'
-      }, function(error, events){ console.log(events); })
+      }, function(error, events){ 
+          console.log(events); 
+          // returnSVG= returnContract.methods.generateSVG().call();
+          // this.setState({svg:returnSVG});
+
+         })
       .then(function(events){
           console.log(events) // same results as the optional callback above
       });
+
+
 
       // Load Colors
       for (var i = 1; i <= returntotalSupply; i++) {
@@ -122,6 +138,7 @@ class App extends Component {
       window.alert('Smart contract not deployed to detected network.')
     }
   }
+
 
   //javascript arrow function =>
   // () define the list of pramaters followed by "fat arrow" => and {} that delimit the functions body
@@ -161,6 +178,12 @@ mint = (color) => {
         )
       }
   )
+}
+
+setPixelColor = (n, color) =>{
+  this.contract.methods.setPixel(n, color)
+  .send({from: this.state.account, gas:3000000})
+
 }
   // mint = (color) => {
   //   this.state.contract.mint(color)
@@ -222,12 +245,12 @@ render() {
         <h1>JUNK</h1>
          <div dangerouslySetInnerHTML={{__html: this.state.svg }} />;
 
-        return({this.state.svg})
+        // return({this.state.svg})
  
-        <h1>more 2JUNK</h1>
-        <svg width='100' height='100'>
-        <circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/>
-        </svg>
+        // <h1>more 2JUNK</h1>
+        // <svg width='100' height='100'>
+        // <circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/>
+        // </svg>
         <hr/>
         <div className="row text-center">
 

@@ -19,7 +19,7 @@ contract Color is ERC721,Ownable {
 	event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
 	event ClearCanvas(address indexed by);
 	event ResetCanvas(address indexed by);
-	event SVGgenerated(address indexed by);
+	event SVGgenerated(string SVG, address indexed by);
 	
 	
 	constructor() ERC721("Color", "COLOR") public {
@@ -27,7 +27,7 @@ contract Color is ERC721,Ownable {
 		buildCanvas();
 		paintCanvas();
 		generateSVG();
-		geerateCanvasSVG();
+		// geerateCanvasSVG();
   	}
 
   	function buildLut() private   {
@@ -65,6 +65,7 @@ contract Color is ERC721,Ownable {
 		// string memory  _priorColor=pixels[0];
 		pixels[_pixn]=_pixcolor;
 		emit PixelChanged(_pixn,_priorColor,_pixcolor, msg.sender);
+		generateSVG();
 		
 	}
 	
@@ -77,36 +78,41 @@ contract Color is ERC721,Ownable {
   		    string memory svg = 
   		    string(
   		    	abi.encodePacked(
-            					"<svg width='100' height='100'>", 
-            					string(
-            						  abi.encodePacked(
-            						  	"<circle cx='50' cy='50' r='20' fill='",pallet[1],"' stroke-width='9' stroke='black'/>"
-            						  				)
-            						  ), 
+            					"<svg width='150' height='180'>", 
+            					string(abi.encodePacked("<circle cx='30' cy='30' r='20' fill='",pixels[0],"' stroke-width='9' stroke='black'/>")),
+            					string(abi.encodePacked("<circle cx='60' cy='30' r='20' fill='",pixels[1],"' stroke-width='9' stroke='black'/>")),
+            					string(abi.encodePacked("<circle cx='90' cy='30' r='20' fill='",pixels[2],"' stroke-width='9' stroke='black'/>")), 
+            					string(abi.encodePacked("<circle cx='30' cy='60' r='20' fill='",pixels[3],"' stroke-width='9' stroke='black'/>")), 
+            					string(abi.encodePacked("<circle cx='60' cy='60' r='20' fill='",pixels[4],"' stroke-width='9' stroke='black'/>")), 
+            					string(abi.encodePacked("<circle cx='90' cy='60' r='20' fill='",pixels[5],"' stroke-width='9' stroke='black'/>")), 
+            					string(abi.encodePacked("<circle cx='30' cy='90' r='20' fill='",pixels[6],"' stroke-width='9' stroke='black'/>")), 
+            					string(abi.encodePacked("<circle cx='60' cy='90' r='20' fill='",pixels[7],"' stroke-width='9' stroke='black'/>")), 
+            					string(abi.encodePacked("<circle cx='90' cy='90' r='20' fill='",pixels[8],"' stroke-width='9' stroke='black'/>")),
             					"</svg>"
         						)
         	);
-  		emit SVGgenerated(msg.sender);
+  		emit SVGgenerated(svg,msg.sender);
 
         return svg;
   	}
 
-  	function geerateCanvasSVG () public returns(string memory)  {
-  		// string[] memory canvasSVG;
-  		string memory canvasSVGheader="<svg width='100' height='100'>";
-  		string memory canvasSVGfooter="</svg>";
-  		 //attache header
-  		//iterate over the pixels and add generate individual strings
-  		//attach footer
-  		//pack and send
-  		canvasSVG.push(canvasSVGheader);
-  		for(uint p=0; p<nPix; p++){
-  			canvasSVG.push(pixels[p]);
-		}	
-		canvasSVG.push(canvasSVGfooter);
-		return string(abi.encodePacked(canvasSVG));
+  // 	function geerateCanvasSVG () public returns(string memory)  {
+  // 		string[] memory pixelholder;
+  // 		string memory canvasSVGheader="<svg width='100' height='100'>";
+  // 		string memory canvasSVGfooter="</svg>";
+  // 		 //attache header
+  // 		//iterate over the pixels and add generate individual strings
+  // 		//attach footer
+  // 		//pack and send
+  // 		canvasSVG.push(canvasSVGheader);
+  // 		for(uint p=0; p<nPix; p++){
+  // 			string pixSring=string()
+  // 			canvasSVG.push(pixels[p]);
+		// }	
+		// canvasSVG.push(canvasSVGfooter);
+		// return string(abi.encodePacked(canvasSVG));
   		
-  	}
+  // 	}
   	
   	// function concat (string memory array) returns(string memory) view internal {
   		
