@@ -12,6 +12,7 @@ contract Color is ERC721,Ownable {
   	uint nPix=nPixX*nPixY;
   	string[] public pixels;
   	string[] public pallet; 
+  	string[] public canvasSVG;
 
 
 	mapping(string => bool) _colorExists;
@@ -26,6 +27,7 @@ contract Color is ERC721,Ownable {
 		buildCanvas();
 		paintCanvas();
 		generateSVG();
+		geerateCanvasSVG();
   	}
 
   	function buildLut() private   {
@@ -77,15 +79,43 @@ contract Color is ERC721,Ownable {
   		    	abi.encodePacked(
             					"<svg width='100' height='100'>", 
             					string(
-            						  abi.encodePacked("<circle cx='50' cy='50' r='20' fill='",pallet[1],"' stroke-width='9' stroke='black'/>")
+            						  abi.encodePacked(
+            						  	"<circle cx='50' cy='50' r='20' fill='",pallet[1],"' stroke-width='9' stroke='black'/>"
+            						  				)
             						  ), 
-            "</svg>"
-        		)
+            					"</svg>"
+        						)
         	);
   		emit SVGgenerated(msg.sender);
 
         return svg;
   	}
+
+  	function geerateCanvasSVG () public returns(string memory)  {
+  		// string[] memory canvasSVG;
+  		string memory canvasSVGheader="<svg width='100' height='100'>";
+  		string memory canvasSVGfooter="</svg>";
+  		 //attache header
+  		//iterate over the pixels and add generate individual strings
+  		//attach footer
+  		//pack and send
+  		canvasSVG.push(canvasSVGheader);
+  		for(uint p=0; p<nPix; p++){
+  			canvasSVG.push(pixels[p]);
+		}	
+		canvasSVG.push(canvasSVGfooter);
+		return string(abi.encodePacked(canvasSVG));
+  		
+  	}
+  	
+  	// function concat (string memory array) returns(string memory) view internal {
+  		
+  	// }
+  	
+
+
+
+
   	// function setPixelTick(uint memory _tick) public payable 
 
     // function totalSupply
