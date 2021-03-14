@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ReactSVG } from 'react-svg'
 import logo from '../logo.png';
 import './App.css';
 import Web3 from 'web3';
@@ -13,6 +14,7 @@ class App extends Component {
       account:'',
       contract: null,
       totalSupply: 1,
+      svg:'', 
       colors: []
     }
   }
@@ -75,6 +77,12 @@ class App extends Component {
       console.log("testreturn ",testreturn)
       console.log("calling totalssupply")
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
+      var returnSVG = await returnContract.methods.generateSVG().call()
+      this.setState({svg:returnSVG})
+      // const tmp="<svg><circle cx="50" cy="50" r="20" fill="#ff0000" stroke-width="9" stroke="black"/></svg>"
+
+      this.setState({svg:"<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/></svg>"})
+      console.log("SVG: ",this.state.svg)
 // const junk= await returnContract.methods.getjunk().call()
 // console.log("junk ",junk)
 // const mintreturn= await returnContract.methods.mint("poop").call()
@@ -89,6 +97,13 @@ class App extends Component {
       .on('error',console.error);
 
       returnContract.getPastEvents('PixelChanged', {
+          fromBlock: 0,
+          toBlock: 'latest'
+      }, function(error, events){ console.log(events); })
+      .then(function(events){
+          console.log(events) // same results as the optional callback above
+      });
+      returnContract.getPastEvents('SVGgenerated', {
           fromBlock: 0,
           toBlock: 'latest'
       }, function(error, events){ console.log(events); })
@@ -204,7 +219,18 @@ render() {
           </main>
         </div>
         <hr/>
+        <h1>JUNK</h1>
+         <div dangerouslySetInnerHTML={{__html: this.state.svg }} />;
+
+        return({this.state.svg})
+ 
+        <h1>more 2JUNK</h1>
+        <svg width='100' height='100'>
+        <circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/>
+        </svg>
+        <hr/>
         <div className="row text-center">
+
           { this.state.colors.map((color, key) => {
             return(
               <div key={key} className="col-md-3 mb-3">

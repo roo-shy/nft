@@ -16,11 +16,16 @@ contract Color is ERC721,Ownable {
 
 	mapping(string => bool) _colorExists;
 	event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
+	event ClearCanvas(address indexed by);
+	event ResetCanvas(address indexed by);
+	event SVGgenerated(address indexed by);
+	
 	
 	constructor() ERC721("Color", "COLOR") public {
 		buildLut();
 		buildCanvas();
 		paintCanvas();
+		generateSVG();
   	}
 
   	function buildLut() private   {
@@ -45,12 +50,13 @@ contract Color is ERC721,Ownable {
 		// uint i=0;
 		for(uint p=0; p<nPix; p++){
 
-			setPixel(p,pallet[p%3]);
+			setPixel(p,pallet[(p%3)+1]);
 			// setPixel(p,"dick");
 
 		}	
 
 	}
+
 
 	function setPixel(uint  _pixn, string memory _pixcolor) public onlyOwner {
 		string memory  _priorColor=pixels[_pixn];
@@ -64,8 +70,16 @@ contract Color is ERC721,Ownable {
 
 
 
-  	function generateSVG() public view returns (string memory){
+  	function generateSVG() public returns (string memory){
   		//returns the svg string of the canvas
+  		        string memory svg = string(abi.encodePacked(
+            "<svg width='100' height='100'>", 
+            string(abi.encodePacked("<circle cx='50' cy='50' style='fill:",pallet[1],";stroke-width:3;stroke:black'/>")), 
+            "</svg>"
+        ));
+  		emit SVGgenerated(msg.sender);
+
+        return svg;
   	}
   	// function setPixelTick(uint memory _tick) public payable 
 
