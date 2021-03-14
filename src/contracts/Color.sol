@@ -72,11 +72,16 @@ contract Color is ERC721,Ownable {
 
   	function generateSVG() public returns (string memory){
   		//returns the svg string of the canvas
-  		        string memory svg = string(abi.encodePacked(
-            "<svg width='100' height='100'>", 
-            string(abi.encodePacked("<circle cx='50' cy='50' style='fill:",pallet[1],";stroke-width:3;stroke:black'/>")), 
+  		    string memory svg = 
+  		    string(
+  		    	abi.encodePacked(
+            					"<svg width='100' height='100'>", 
+            					string(
+            						  abi.encodePacked("<circle cx='50' cy='50' r='20' fill='",pallet[1],"' stroke-width='9' stroke='black'/>")
+            						  ), 
             "</svg>"
-        ));
+        		)
+        	);
   		emit SVGgenerated(msg.sender);
 
         return svg;
