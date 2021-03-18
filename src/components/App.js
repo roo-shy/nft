@@ -88,12 +88,15 @@ class App extends Component {
       returnContract.events.SVGgenerated()
       .on('data', (event) => {
         console.log("SVG EVENT ",event);
+        this.setState({svg:event.returnValues[0]})
+
+
       })
       .on('error', console.error)
 
       returnContract.events.PixelChanged()
       .on('data', (event) => {
-        console.log("PIXEL CHANGED EVENT ",event);
+        console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
       })
       .on('error', console.error)
 // const junk= await returnContract.methods.getjunk().call()
