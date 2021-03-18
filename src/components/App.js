@@ -90,6 +90,12 @@ class App extends Component {
         console.log("SVG EVENT ",event);
       })
       .on('error', console.error)
+
+      returnContract.events.PixelChanged()
+      .on('data', (event) => {
+        console.log("PIXEL CHANGED EVENT ",event);
+      })
+      .on('error', console.error)
 // const junk= await returnContract.methods.getjunk().call()
 // console.log("junk ",junk)
 // const mintreturn= await returnContract.methods.mint("poop").call()
@@ -181,7 +187,7 @@ mint = (color) => {
 }
 
 setPixelColor = (n, color) =>{
-  this.contract.methods.setPixel(n, color)
+  this.state.contract.methods.setPixel(n, color)
   .send({from: this.state.account, gas:3000000})
 
 }
@@ -224,7 +230,8 @@ render() {
               <form onSubmit={(event) => {
                 event.preventDefault()
                 const color = this.color.value
-                this.mint(color)
+                const n = this.n.value
+                this.setPixelColor(n,color)
               }}>
                 <input
                   type='text'
@@ -233,9 +240,15 @@ render() {
                   ref={(input) => { this.color = input }}
                 />
                 <input
+                  type='text'
+                  className='form-control mb-1'
+                  placeholder='pixel number'
+                  ref={(input) => { this.n = input }}
+                />
+                <input
                   type='submit'
                   className='btn btn-block btn-primary'
-                  value='MINT'
+                  value='SET PIXEL COLOR'
                 />
               </form>
             </div>

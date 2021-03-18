@@ -60,7 +60,7 @@ contract Color is ERC721,Ownable {
 	}
 
 
-	function setPixel(uint  _pixn, string memory _pixcolor) public onlyOwner {
+	function setPixel(uint  _pixn, string memory _pixcolor) public  {
 		string memory  _priorColor=pixels[_pixn];
 		// string memory  _priorColor=pixels[0];
 		pixels[_pixn]=_pixcolor;
