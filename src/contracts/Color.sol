@@ -16,10 +16,21 @@ contract Color is ERC721,Ownable {
 
 
 	mapping(string => bool) _colorExists;
+	mapping (uint256 => Etherbright) allEtherbrights;
+
+	struct Etherbright {
+		string[] setPixels;
+		string[] pallet;
+		string[] mintPixels;
+		uint256 seed;
+	}
+	
+	
 	event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
 	event ClearCanvas(address indexed by);
 	event ResetCanvas(address indexed by);
 	event SVGgenerated(string SVG, address indexed by);
+	event EtherbrightMinted(uint256 seed, string mintedBy);
 	
 	
 	constructor() ERC721("Color", "COLOR") public {
@@ -29,6 +40,17 @@ contract Color is ERC721,Ownable {
 		generateSVG();
 		// geerateCanvasSVG();
   	}
+  	function mintEtherbright(address to) public{
+	  bytes32 idHash = keccak256(abi.encodePacked(block.timestamp, to));
+      uint256 tokenId = uint(hashed);
+      uint256 etherbrightSeed = tokenId & 4000;
+
+	  Etherbright etherbright;
+	  etherbright.seed=etherbrightSeed;
+	  allEtherbrights[tokenId]=etherbright;
+	  emit EtherbrightMinted(etherbrightSeed, to);
+	  _mint(msg.sender, tokenId);
+	}
 
   	function buildLut() private   {
   		pallet.push("#000000");
@@ -36,6 +58,8 @@ contract Color is ERC721,Ownable {
 		pallet.push("#00ff00");
 		pallet.push("#0000ff");
   	}
+
+
 
   	function buildCanvas () private {
   		for(uint p=0; p<nPix; p++){
@@ -60,7 +84,7 @@ contract Color is ERC721,Ownable {
 	}
 
 
-	function setPixel(uint  _pixn, string memory _pixcolor) public  {
+	function setPixel(uint  _pixn, string memory _pixcolor) public {
 		string memory  _priorColor=pixels[_pixn];
 		// string memory  _priorColor=pixels[0];
 		pixels[_pixn]=_pixcolor;

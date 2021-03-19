@@ -3,7 +3,7 @@ NOTES:
 1- truffle compile -all
 2- truffle migrate --reset
 3-npm run start
-ganache-cli -i 5777 -g 100
+ganache-cli -i 5777 -g 1 -l 900000000
 
 truffle version
 
@@ -32,3 +32,6 @@ Web3.js v1.2.9
 https://github.com/trufflesuite/ganache-cli/blob/master/README.md
 npm install -g ganache-cli
 
+GAS:
+gas limit = is the maximum gas youll pay per transaction
+gas price = the amout of gwei youll pay per unit of gas

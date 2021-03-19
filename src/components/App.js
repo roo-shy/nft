@@ -89,8 +89,6 @@ class App extends Component {
       .on('data', (event) => {
         console.log("SVG EVENT ",event);
         this.setState({svg:event.returnValues[0]})
-
-
       })
       .on('error', console.error)
 
@@ -213,11 +211,11 @@ render() {
       <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
         <a
           className="navbar-brand col-sm-3 col-md-2 mr-0"
-          href="http://www.dappuniversity.com/bootcamp"
+          href="http://www.TheEverbright.com"
           target="_blank"
           rel="noopener noreferrer"
         >
-          Color Tokens
+          Etherbright
         </a>
         <ul className="navbar-nav px-3">
           <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
@@ -229,7 +227,7 @@ render() {
         <div className="row">
           <main role="main" className="col-lg-12 d-flex text-center">
             <div className="content mr-auto ml-auto">
-              <h1>Issue Token</h1>
+              <h1>setPixelColor</h1>
               <form onSubmit={(event) => {
                 event.preventDefault()
                 const color = this.color.value
