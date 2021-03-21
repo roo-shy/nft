@@ -97,6 +97,12 @@ class App extends Component {
         console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
       })
       .on('error', console.error)
+
+      returnContract.events.EtherbrightMinted()
+      .on('data', (event) => {
+        console.log("Etherbright Minted ",event);
+      })
+      .on('error', console.error)
 // const junk= await returnContract.methods.getjunk().call()
 // console.log("junk ",junk)
 // const mintreturn= await returnContract.methods.mint("poop").call()
@@ -187,6 +193,11 @@ mint = (color) => {
   )
 }
 
+mintEtherbright = ()=>{
+  this.state.contract.methods.mintEtherbright(this.state.account)
+  .send({from: this.state.account ,gas:3000000})
+}
+
 setPixelColor = (n, color) =>{
   this.state.contract.methods.setPixel(n, color)
   .send({from: this.state.account, gas:3000000})
@@ -255,6 +266,8 @@ render() {
             </div>
           </main>
         </div>
+        <hr/>
+        <button onClick={this.mintEtherbright}>mint etherbright</button>
         <hr/>
         <h1>JUNK</h1>
          <div dangerouslySetInnerHTML={{__html: this.state.svg }} />;
