@@ -8,8 +8,8 @@ module.exports = {
   networks: {
     development: {
       websockets: true,
- gas: 500000000,  // gas limit
- gasPrice: 1,
+      gas: 900000000,  // gas limit
+      gasPrice: 1,
       host: "127.0.0.1",
       port: 8545,
       network_id: "5777" // Match any network id

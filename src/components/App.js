@@ -77,6 +77,9 @@ class App extends Component {
       console.log("testreturn ",testreturn)
       console.log("calling totalssupply")
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
+      console.log("returntotalsupply",returntotalSupply.toString())
+      console.log("state total supply",this.state.totalSupply)
+      this.setState({ totalSupply:returntotalSupply }) //sets state var
       var returnSVG = await returnContract.methods.generateSVG().call()
       this.setState({svg:returnSVG})
       // const tmp="<svg><circle cx="50" cy="50" r="20" fill="#ff0000" stroke-width="9" stroke="black"/></svg>"
@@ -108,9 +111,7 @@ class App extends Component {
 // const mintreturn= await returnContract.methods.mint("poop").call()
 // console.log("mintreturn ",mintreturn)
 
-      console.log("returntotalsupply",returntotalSupply.toString())
-      console.log("state total supply",this.state.totalSupply)
-      this.setState({ totalSupply:returntotalSupply }) //sets state var
+
 
       returnContract.events.Transfer()
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})

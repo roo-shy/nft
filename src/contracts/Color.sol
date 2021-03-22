@@ -43,10 +43,11 @@ contract Color is ERC721,Ownable {
 		generateSVG();
 		// geerateCanvasSVG();
   	}
+
   	function mintEtherbright(address to) public{
 	  bytes32 idHash = keccak256(abi.encodePacked(block.timestamp, to));
       uint256 tokenId = uint(idHash);
-      uint256 etherbrightSeed = tokenId & 4000;
+      uint256 etherbrightSeed = tokenId % 4000;
 
 	  Etherbright memory etherbright;
 	  etherbright.seed=etherbrightSeed;
@@ -62,12 +63,9 @@ contract Color is ERC721,Ownable {
 	function buildEtherbright (uint256 tokenId ) internal {
 		// Etherbright memory ethb=allEtherbrights[tokenId];
 		// ethb.pallet=getPalletFromSeed(tokenId, 1);
-		setEthebrightPallet(tokenId);
-		for(uint p=0; p<nPix; p++){
-			allEtherbrights[tokenId].setPixels.push(allEtherbrights[tokenId].pallet[(p%3)+1]);
-			allEtherbrights[tokenId].mintPixels.push(allEtherbrights[tokenId].pallet[(p%3)+1]);
+		setEtherbrightPallet(tokenId);
+		setAllEtherbrightPixels(tokenId);
 
-		}
 		// Etherbright memory ethb=allEtherbrights[tokenId];
 		// // ethb.pallet=getPalletFromSeed(tokenId, 1);
 		// setEthebrightPallet(tokenId);
@@ -78,8 +76,16 @@ contract Color is ERC721,Ownable {
 		// }
 
 	}
+	function setAllEtherbrightPixels (uint256 tokenId) internal {
+		for(uint p=0; p<nPix; p++){
+			allEtherbrights[tokenId].setPixels.push(allEtherbrights[tokenId].pallet[(p%3)+1]);
+			// allEtherbrights[tokenId].mintPixels.push(allEtherbrights[tokenId].pallet[(p%3)+1]);
 
-	function setEthebrightPallet (uint256 tokenId)  internal {
+		}
+	}
+	
+
+	function setEtherbrightPallet (uint256 tokenId)  internal {
 		// Etherbright memory ethb=allEtherbrights[tokenId];
 		uint8 selector=toUint8(abi.encodePacked(tokenId), 1);
 		if(selector >= 0 && selector < 85 ){
@@ -281,9 +287,9 @@ contract Color is ERC721,Ownable {
       return junk;
     }
   
-	function testReturn(string memory _color) public returns(string memory) {
+	function testReturn(string memory _returnString) public returns(string memory) {
 	    // _mint(msg.sender, 1);
-	    return _color;
+	    return _returnString;
 	}
 
 	function mint(string memory _color) public {
