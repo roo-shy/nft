@@ -8,7 +8,7 @@ module.exports = {
   networks: {
     development: {
       websockets: true,
-      gas: 900000000,  // gas limit
+      gas: 90000000,  // gas limit
       gasPrice: 1,
       host: "127.0.0.1",
       port: 8545,
@@ -19,9 +19,13 @@ module.exports = {
   contracts_build_directory: './src/abis/',
   compilers: {
     solc: {
-      version:"0.7.4"
-      // version:"0.8.0"
-
+      version:"0.7.4",
+      setttings: {
+        optimizer: {
+          enabled: true,
+          runs: 1500
+        }
+      }
     }
   }
 }
