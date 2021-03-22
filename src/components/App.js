@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { ReactSVG } from 'react-svg'
-import logo from '../logo.png';
+// import { ReactSVG } from 'react-svg'
+// import logo from '../logo.png';
 import './App.css';
 import Web3 from 'web3';
 import Color from '../abis/Color.json'
@@ -48,16 +48,12 @@ class App extends Component {
     await this.loadBlockchainData()
   }
   async loadBlockchainData() {
-    // console.log("A")
     const web3 = window.web3
     // Load account
     const accounts = await web3.eth.getAccounts() //gets accout from metamask
     this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
-        // console.log("B",accounts[0])
     const networkId = await web3.eth.net.getId() //detercts the eth network 
-        // console.log("C",networkId)
     const networkData = Color.networks[networkId] //gets the contracts address on the network
-        // console.log("D")
     console.log("netowrkdata",networkId)
     if(networkData) {//if it has an addres
       const abi = Color.abi //creates a JS version of the contract with its abi
@@ -67,10 +63,7 @@ class App extends Component {
       console.log("abi:",abi);
 
       const returnContract = new web3.eth.Contract(abi, address)//creates a new version of this contract
-      // web3.eth.defaultAccount(address);
-      // const returnContract = new web3.eth.Contract(abi);
       this.setState({ contract:returnContract })//sets it in state obj
-      // console.log("contractName:",returnContract.contractName);
       console.log("contract:",this.state.contract)
       console.log("calling test return")
       const testreturn=returnContract.methods.testReturn("this is a test").call({from: this.state.account})
@@ -106,12 +99,6 @@ class App extends Component {
         console.log("Etherbright Minted ",event);
       })
       .on('error', console.error)
-// const junk= await returnContract.methods.getjunk().call()
-// console.log("junk ",junk)
-// const mintreturn= await returnContract.methods.mint("poop").call()
-// console.log("mintreturn ",mintreturn)
-
-
 
       returnContract.events.Transfer()
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
@@ -141,13 +128,13 @@ class App extends Component {
 
 
 
-      // Load Colors
-      for (var i = 1; i <= returntotalSupply; i++) {
-        const color = await returnContract.methods.colors(i - 1).call()
-        this.setState({
-          colors: [...this.state.colors, color]
-        })
-      }
+      // // Load Colors
+      // for (var i = 1; i <= returntotalSupply; i++) {
+      //   const color = await returnContract.methods.colors(i - 1).call()
+      //   this.setState({
+      //     colors: [...this.state.colors, color]
+      //   })
+      // }
     } else {
       window.alert('Smart contract not deployed to detected network.')
     }
@@ -203,6 +190,19 @@ setPixelColor = (n, color) =>{
   this.state.contract.methods.setPixel(n, color)
   .send({from: this.state.account, gas:3000000})
 
+}
+
+getAllTokenId = ()=>{
+  // var nTokens=this.state.contract.methods.totalSupply().call();
+  // for (var i = 0; i <nTokens; i++) {
+  //   console.log("getalldis ",i)
+  // }
+  this.state.contract.methods.totalSupply().call()
+  .then(
+      function(totalSupply){
+        console.log("Total Supply with a promise:",  totalSupply);
+      }
+      )
 }
   // mint = (color) => {
   //   this.state.contract.mint(color)
@@ -269,6 +269,10 @@ render() {
         </div>
         <hr/>
         <button onClick={this.mintEtherbright}>mint etherbright</button>
+                <hr/>
+
+        <button onClick={this.getAllTokenId}>get all token ID</button>
+
         <hr/>
         <h1>JUNK</h1>
          <div dangerouslySetInnerHTML={{__html: this.state.svg }} />;
