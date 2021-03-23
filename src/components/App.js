@@ -15,7 +15,10 @@ class App extends Component {
       contract: null,
       totalSupply: 1,
       svg:'', 
-      colors: []
+      colors: [],
+      etherbrights: [],
+      allSVGs: []
+
     }
   }
 
@@ -88,6 +91,13 @@ class App extends Component {
       })
       .on('error', console.error)
 
+      returnContract.events.EtherbrightSVGgenerated()
+      .on('data', (event) => {
+        console.log("ETHB SVG EVENT ",event);
+        // this.setState({svg:event.returnValues[0]})
+      })
+      .on('error', console.error)
+
       returnContract.events.PixelChanged()
       .on('data', (event) => {
         console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
@@ -128,13 +138,31 @@ class App extends Component {
 
 
 
-      // // Load Colors
+      // Load Colors
       // for (var i = 1; i <= returntotalSupply; i++) {
       //   const color = await returnContract.methods.colors(i - 1).call()
       //   this.setState({
       //     colors: [...this.state.colors, color]
       //   })
       // }
+      for (var i = 1; i <= returntotalSupply; i++) {
+        const ethb = await returnContract.methods.tokenByIndex(i - 1).call()
+        // console.log("etcbs: ",ethb)
+        this.setState({
+          etherbrights: [...this.state.etherbrights, ethb]
+        })
+        
+        const returnedSVG = await returnContract.methods.generateEtherbrightsSVG(ethb).call()
+        // console.log("svgs: ",returnedSVG)
+
+        this.setState({
+          allSVGs:[...this.state.allSVGs,returnedSVG]
+        })
+        // console.log(this.state.allSVGs)
+
+
+      }
+      console.log(this.state.allSVGs)
     } else {
       window.alert('Smart contract not deployed to detected network.')
     }
@@ -185,6 +213,7 @@ mintEtherbright = ()=>{
   this.state.contract.methods.mintEtherbright(this.state.account)
   .send({from: this.state.account ,gas:3000000})
 }
+
 
 setPixelColor = (n, color) =>{
   this.state.contract.methods.setPixel(n, color)
@@ -267,80 +296,43 @@ render() {
             </div>
           </main>
         </div>
-        <hr/>
-        <button onClick={this.mintEtherbright}>mint etherbright</button>
-                <hr/>
+          <hr/>
+          <button onClick={this.mintEtherbright}>mint etherbright</button>
+          <hr/>
+          <button onClick={this.getAllTokenId}>get all token ID</button>
+          <hr/>
+          <h1>JUNK</h1>
+          <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
+          <hr/>
+          <div dangerouslySetInnerHTML={{__html: this.state.allSVGs }} />
+          <h1>more 2JUNK</h1>
+            <svg width='100' height='100'>
+            <circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/>
+            </svg>
+          <hr/>
 
-        <button onClick={this.getAllTokenId}>get all token ID</button>
-
-        <hr/>
-        <h1>JUNK</h1>
-         <div dangerouslySetInnerHTML={{__html: this.state.svg }} />;
-
-        // return({this.state.svg})
- 
-        <h1>more 2JUNK</h1>
-        <svg width='100' height='100'>
-        <circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/>
-        </svg>
-        <hr/>
         <div className="row text-center">
+          <div>
+            {this.state.etherbrights.map(name => (
+            <li>{name.toString()}</li>
+            ))}
+          </div>
 
-          { this.state.colors.map((color, key) => {
-            return(
-              <div key={key} className="col-md-3 mb-3">
-                <div className="token" style={{ backgroundColor: color }}></div>
-                <div>{color}</div>
-              </div>
-            )
-          })}
+        {/*  { this.state.colors.map(
+            (color, key) => {
+              return(
+                <div key={key} className="col-md-3 mb-3">
+                  <div className="token" style={{ backgroundColor: color }}></div>
+                  <div>{color}</div>
+                </div>
+              )
+            })
+          }
+          */}
         </div>
       </div>
     </div>
   );
  }
-  // render() {
-  //   return (
-  //     <div>
-  //       <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-  //         <a
-  //           className="navbar-brand col-sm-3 col-md-2 mr-0"
-  //           href="http://www.TheEverbright.com"
-  //           target="_blank"
-  //           rel="noopener noreferrer"
-  //         >
-  //           Etherbright
-  //         </a>
-  //       </nav>
-  //       <div className="container-fluid mt-5">
-  //         <div className="row">
-  //           <main role="main" className="col-lg-12 d-flex text-center">
-  //             <div className="content mr-auto ml-auto">
-  //               <a
-  //                 href="http://www.TheEverbright.com"
-  //                 target="_blank"
-  //                 rel="noopener noreferrer"
-  //               >
-  //                 <img src={logo} className="App-logo" alt="logo" />
-  //               </a>
-  //               <h1>Etherbright Beta</h1>
-  //               <p>
-  //                 Edit <code>src/components/App.js</code> and save to reload.
-  //               </p>
-  //               <a
-  //                 className="App-link"
-  //                 href="http://www.TheEverbright.com"
-  //                 target="_blank"
-  //                 rel="noopener noreferrer"
-  //               >
-  //                 Etherbright!
-  //               </a>
-  //             </div>
-  //           </main>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 }
 export default App;

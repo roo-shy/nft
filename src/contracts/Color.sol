@@ -136,9 +136,9 @@ contract Color is ERC721,Ownable,TestColor {
 	}
 	
 
-  	function generateEtherbrightsSVG(uint256 _tokenId) public{
+  	function generateEtherbrightsSVG(uint256 _tokenId) public returns (string memory){
   		//returns the svg string of the canvas
-  		    string memory svg = 
+  		    string memory ethbsvg = 
   		    string(
   		    	abi.encodePacked(
             					"<svg width='150' height='180'>", 
@@ -154,7 +154,8 @@ contract Color is ERC721,Ownable,TestColor {
             					"</svg>"
         						)
         	);
-  		emit EtherbrightSVGgenerated(_tokenId,svg,msg.sender);
+  		emit EtherbrightSVGgenerated(_tokenId,ethbsvg,msg.sender);
+  		return ethbsvg;
 
   	}
 
