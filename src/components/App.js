@@ -5,6 +5,11 @@ import './App.css';
 import Web3 from 'web3';
 import Color from '../abis/Color.json'
 
+function Etherbright(id, svg){
+  this.id=id;
+  this.svg=svg;
+
+}
 
 class App extends Component {
 
@@ -17,6 +22,7 @@ class App extends Component {
       svg:'', 
       colors: [],
       etherbrights: [],
+      etherbrightIDs: [],
       allSVGs: []
 
     }
@@ -107,6 +113,10 @@ class App extends Component {
       returnContract.events.EtherbrightMinted()
       .on('data', (event) => {
         console.log("Etherbright Minted ",event);
+          var ethb=new Etherbright(event.returnValues[0],event.returnValues[1]);
+        this.setState({
+          etherbrights: [...this.state.etherbrights, ethb]
+        })
       })
       .on('error', console.error)
 
@@ -146,20 +156,23 @@ class App extends Component {
       //   })
       // }
       for (var i = 1; i <= returntotalSupply; i++) {
-        const ethb = await returnContract.methods.tokenByIndex(i - 1).call()
+
+        var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
         // console.log("etcbs: ",ethb)
-        this.setState({
-          etherbrights: [...this.state.etherbrights, ethb]
-        })
+        // this.setState({
+        //   etherbrightIDs: [...this.state.etherbrightIDs, ethb]
+        // })
         
-        const returnedSVG = await returnContract.methods.generateEtherbrightsSVG(ethb).call()
+        var ethbSVG = await returnContract.methods.generateEtherbrightsSVG(ethbID).call()
         // console.log("svgs: ",returnedSVG)
 
-        this.setState({
-          allSVGs:[...this.state.allSVGs,returnedSVG]
-        })
+        // this.setState({
+        //   allSVGs:[...this.state.allSVGs,returnedSVG]
+        // })
         // console.log(this.state.allSVGs)
-
+        this.setState({
+          etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG)]
+        })
 
       }
       console.log(this.state.allSVGs)
@@ -300,6 +313,7 @@ render() {
           <button onClick={this.mintEtherbright}>mint etherbright</button>
           <hr/>
           <button onClick={this.getAllTokenId}>get all token ID</button>
+          {/*
           <hr/>
           <h1>JUNK</h1>
           <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
@@ -310,11 +324,19 @@ render() {
             <circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/>
             </svg>
           <hr/>
+        */}
 
         <div className="row text-center">
           <div>
-            {this.state.etherbrights.map(name => (
-            <li>{name.toString()}</li>
+
+
+            {this.state.etherbrights.map(ethb => (
+              <div id="parent">
+              <hr/>
+                <div dangerouslySetInnerHTML={{__html: ethb.svg }} />
+                <li>{ethb.id.toString()}</li>
+              </div>
+
             ))}
           </div>
 

@@ -27,6 +27,7 @@ contract Color is ERC721,Ownable,TestColor {
 		string[] pallet;
 		string[] mintPixels;
 		uint256 seed;
+		uint256 seriesNumber;
 	}
 	
 	
@@ -34,7 +35,7 @@ contract Color is ERC721,Ownable,TestColor {
 	event ClearCanvas(address indexed by);
 	event ResetCanvas(address indexed by);
 	// event SVGgenerated(string SVG, address indexed by);
-	event EtherbrightMinted(uint256 seed, address mintedBy, uint256 nEtherbrights);
+	event EtherbrightMinted(uint256 tokenId, string svg, address mintedBy, uint256 nEtherbrights);
 	event EtherbrightPixelChanged(uint256 tokenId, string from, string to, address indexed by);
 	event EtherbrightSVGgenerated(uint _tokenId, string svg, address indexed by);
 	
@@ -54,13 +55,16 @@ contract Color is ERC721,Ownable,TestColor {
 
 	  Etherbright memory etherbright;
 	  etherbright.seed=etherbrightSeed;
+	  etherbright.seriesNumber=numberOfEtherbrights;
 	  // etherbright.pallet=getPalletFromSeed(etherbrightSeed.seed);
 	  allEtherbrights[tokenId]=etherbright;
 	  buildEtherbright(tokenId);
 
 	  _mint(msg.sender, tokenId);
 	  numberOfEtherbrights+=1;
-	  emit EtherbrightMinted(etherbrightSeed, to, numberOfEtherbrights);
+	  string memory tmpsvg=generateEtherbrightsSVG(tokenId);
+	  emit EtherbrightMinted(tokenId, tmpsvg, to, numberOfEtherbrights);
+	// event EtherbrightMinted(uint256 tokenId, address mintedBy, uint256 nEtherbrights, string svg);
 
 	}
 	function buildEtherbright (uint256 tokenId ) internal {
