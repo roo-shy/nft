@@ -28,7 +28,8 @@ class App extends Component {
       colors: [],
       etherbrights: [],
       etherbrightIDs: [],
-      allSVGs: []
+      allSVGs: [],
+      SVGmap: null
 
     }
   }
@@ -61,6 +62,9 @@ class App extends Component {
     console.log("loadBlockchainData")
     await this.loadBlockchainData()
   }
+
+
+
   async loadBlockchainData() {
     const web3 = window.web3
     // Load account
@@ -113,7 +117,18 @@ class App extends Component {
       .on('data', (event) => {
         console.log("ETHB PIXEL CHANGED EVENT ",event);
         // this.setState({svg:event.returnValues[0]})
-        this.updateEtherbright(event);
+        //this.updateEtherbright(event);
+        const id=event.returnValues[0];
+        this.state.etherbrights.map(ethb =>{
+          if(ethb.id=id){
+            console.log("THIS IS IT");
+            var returnSVG =  returnContract.methods.generateEtherbrightsSVG(id).call()
+            ethb.svg=returnSVG;
+
+          }
+
+          }
+          )
 
       })
       .on('error', console.error)
@@ -170,6 +185,7 @@ class App extends Component {
       //     colors: [...this.state.colors, color]
       //   })
       // }
+      var _svgmap = new Map();
       for (var i = 1; i <= returntotalSupply; i++) {
 
         var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
@@ -185,12 +201,15 @@ class App extends Component {
         //   allSVGs:[...this.state.allSVGs,returnedSVG]
         // })
         // console.log(this.state.allSVGs)
+        _svgmap.set(ethbID,ethbSVG);
         this.setState({
           etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG)]
         })
 
       }
-      console.log(this.state.allSVGs)
+      this.setState({svgmap:_svgmap})
+      console.log("allsvgs",this.state.allSVGs)
+      console.log("MAP", this.state.svgmap)
     } else {
       window.alert('Smart contract not deployed to detected network.')
     }
@@ -237,9 +256,7 @@ mint = (color) => {
       }
   )
 }
-updateEtherbright= (event)=>{
-  console.log("updateEtherbright",event)
-}
+
 mintEtherbright = ()=>{
   this.state.contract.methods.mintEtherbright(this.state.account)
   .send({from: this.state.account ,gas:3000000})
@@ -351,16 +368,15 @@ render() {
           <hr/>
         */}
 
+
+
+
         <div className="row text-center">
           <div>
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
                 <EthbDisplay id={ethb.id} svg={ethb.svg} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)}/>
-                {/*
-                <div dangerouslySetInnerHTML={{__html: ethb.svg }} />
-                <li>{ethb.id.toString()}</li>
-                */}
               </div>
             ))}
           </div>
