@@ -5,13 +5,18 @@ import './App.css';
 import Web3 from 'web3';
 import Color from '../abis/Color.json'
 
-function Etherbright(id, svg){
+function Etherbright(id, svg,){
   this.id=id;
   this.svg=svg;
 
 }
 
+    
+
+  
+
 class App extends Component {
+
 
   constructor(props){
     super(props)
@@ -104,9 +109,19 @@ class App extends Component {
       })
       .on('error', console.error)
 
+      returnContract.events.EtherbrightPixelChanged()
+      .on('data', (event) => {
+        console.log("ETHB PIXEL CHANGED EVENT ",event);
+        // this.setState({svg:event.returnValues[0]})
+        this.updateEtherbright(event);
+
+      })
+      .on('error', console.error)
+
       returnContract.events.PixelChanged()
       .on('data', (event) => {
         console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
+
       })
       .on('error', console.error)
 
@@ -207,6 +222,7 @@ class App extends Component {
 //         }
 //     )
 //   }
+
 mint = (color) => {
   this.state.contract.methods.mint(color)
   .send({from: this.state.account, gas:3000000 })//gas must be set with each call for Ganche-cli
@@ -221,7 +237,9 @@ mint = (color) => {
       }
   )
 }
-
+updateEtherbright= (event)=>{
+  console.log("updateEtherbright",event)
+}
 mintEtherbright = ()=>{
   this.state.contract.methods.mintEtherbright(this.state.account)
   .send({from: this.state.account ,gas:3000000})
@@ -234,6 +252,10 @@ setPixelColor = (n, color) =>{
 
 }
 
+setEtherbrightPixelColor = (id, pixn, paln) => {
+  this.state.contract.methods.setEtherbrightPixel(id, pixn, paln)
+  .send({from: this.state.account, gas:3000000})
+}
 getAllTokenId = ()=>{
   // var nTokens=this.state.contract.methods.totalSupply().call();
   // for (var i = 0; i <nTokens; i++) {
@@ -259,6 +281,9 @@ getAllTokenId = ()=>{
   //       }
   //   )
   // }
+
+
+
 render() {
   return (
     <div>
@@ -328,15 +353,15 @@ render() {
 
         <div className="row text-center">
           <div>
-
-
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
+                <EthbDisplay id={ethb.id} svg={ethb.svg} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)}/>
+                {/*
                 <div dangerouslySetInnerHTML={{__html: ethb.svg }} />
                 <li>{ethb.id.toString()}</li>
+                */}
               </div>
-
             ))}
           </div>
 
@@ -356,5 +381,54 @@ render() {
     </div>
   );
  }
+}
+
+class EthbDisplay extends Component{
+  constructor(props){
+    super(props);
+    this.state={
+      id: props.id,
+      svg: props.svg,
+    };
+  }
+
+  render(){
+    return(
+      <div>
+          <h1>ETHBDISPLAY</h1>
+                <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
+                Etherbright id: {this.state.id.toString()}
+              <h3>setPixelColor</h3>
+              <form onSubmit={(event) => {
+                event.preventDefault()
+                const paln = this.paln.value
+                const pixn = this.pixn.value
+                const id = this.state.id
+                this.props.setmethod(this.state.id,pixn,paln)
+              }}>
+                <input
+                  type='text'
+                  className='form-control mb-1'
+                  placeholder='pallent n'
+                  ref={(input) => { this.paln = input }}
+                />
+                <input
+                  type='text'
+                  className='form-control mb-1'
+                  placeholder='pixel number'
+                  ref={(input) => { this.pixn = input }}
+                />
+                <input
+                  type='submit'
+                  className='btn btn-block btn-primary'
+                  value='SET PIXEL COLOR'
+                />
+              </form>
+      <button className="button" onClick={() => alert(this.state.id)}>
+      </button>
+          <hr/>
+          </div>
+      );
+    }
 }
 export default App;
