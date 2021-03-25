@@ -36,7 +36,7 @@ contract Color is ERC721,Ownable,TestColor {
 	event ResetCanvas(address indexed by);
 	// event SVGgenerated(string SVG, address indexed by);
 	event EtherbrightMinted(uint256 tokenId, string svg, address mintedBy, uint256 nEtherbrights);
-	event EtherbrightPixelChanged(uint256 tokenId, string from, string to, address indexed by);
+	event EtherbrightPixelChanged(uint256 tokenId, string svg, string from, string to, address indexed by);
 	event EtherbrightSVGgenerated(uint _tokenId, string svg, address indexed by);
 	
 	
@@ -135,7 +135,8 @@ contract Color is ERC721,Ownable,TestColor {
 		string memory _priorColor=allEtherbrights[_tokenId].setPixels[_pixn];
 		string memory _newColor=allEtherbrights[_tokenId].pallet[_palletN];
 		allEtherbrights[_tokenId].setPixels[_pixn]=_newColor;
-		emit EtherbrightPixelChanged(_tokenId, _priorColor, _newColor, msg.sender);
+		string memory _newSVG=generateEtherbrightsSVG(_tokenId);	
+		emit EtherbrightPixelChanged(_tokenId, _newSVG, _priorColor, _newColor, msg.sender);
 		
 	}
 	

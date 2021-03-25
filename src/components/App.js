@@ -29,7 +29,6 @@ class App extends Component {
       etherbrights: [],
       etherbrightIDs: [],
       allSVGs: [],
-      SVGmap: null
 
     }
   }
@@ -116,19 +115,48 @@ class App extends Component {
       returnContract.events.EtherbrightPixelChanged()
       .on('data', (event) => {
         console.log("ETHB PIXEL CHANGED EVENT ",event);
-        // this.setState({svg:event.returnValues[0]})
-        //this.updateEtherbright(event);
-        const id=event.returnValues[0];
-        this.state.etherbrights.map(ethb =>{
-          if(ethb.id=id){
-            console.log("THIS IS IT");
-            var returnSVG =  returnContract.methods.generateEtherbrightsSVG(id).call()
-            ethb.svg=returnSVG;
+          // returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call()
+          //   .then(function(result){console.log(result)})
 
-          }
+        for (var index = 0; index < this.state.etherbrights.length; index++) {
+          console.log("index ",index);
+          console.log("state ID ",this.state.etherbrights[index].id.toHexString());
+          console.log("event id ",event.returnValues[0].toHexString());
 
+          if (this.state.etherbrights[index].id.toHexString() === event.returnValues[0].toHexString()) {
+            console.log("THIS IS IT")
+            break;
           }
-          )
+        }
+
+        var _etherbrights = Object.assign(this.state.etherbrights);
+          var tmp;
+        // _etherbrights[index].svg="<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/></svg>";
+        // _etherbrights[index].svg=returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call().then(function(result){tmp=result;console.log(result)} );
+                _etherbrights[index].svg=event.returnValues[1]
+
+          console.log("tmp result ",tmp );
+  this.setState({etherbrights  :[] });
+  this.setState({etherbrights:_etherbrights });
+
+              // this.setMethod(_etherbrights);
+
+
+
+        // this.state.etherbrights.map(ethb =>{
+        //   if(ethb.id=event.returnValues[0]){
+
+        //     // console.log("THIS IS IT", index);
+        //     var returnSVG =  returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call()
+        //     // this.setState()
+        //     // let tmparray=this.state.etherbrights.slice();
+        //     // tmparray[id][svg]=returnSVG;
+        //     // setarray(tmparray);
+
+        //   }
+
+        //   }
+        //   )
 
       })
       .on('error', console.error)
@@ -185,7 +213,7 @@ class App extends Component {
       //     colors: [...this.state.colors, color]
       //   })
       // }
-      var _svgmap = new Map();
+      // var _svgmap = new Map();
       for (var i = 1; i <= returntotalSupply; i++) {
 
         var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
@@ -201,19 +229,20 @@ class App extends Component {
         //   allSVGs:[...this.state.allSVGs,returnedSVG]
         // })
         // console.log(this.state.allSVGs)
-        _svgmap.set(ethbID,ethbSVG);
+        // _svgmap.set(ethbID,ethbSVG);
         this.setState({
           etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG)]
         })
 
       }
-      this.setState({svgmap:_svgmap})
+      // this.setState({SVGmap:_svgmap})
       console.log("allsvgs",this.state.allSVGs)
-      console.log("MAP", this.state.svgmap)
+      // console.log("MAP", this.state.svgmap)
     } else {
       window.alert('Smart contract not deployed to detected network.')
     }
   }
+
 
 
   //javascript arrow function =>
@@ -256,7 +285,16 @@ mint = (color) => {
       }
   )
 }
+ setMethod(newstate){
+   var _etherbrights = Object.assign(this.state.etherbrights);
+          _etherbrights[1].svg="<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/></svg>";
+                  console.log("SETSTAT",_etherbrights)
 
+  this.setState({etherbrights  :[] });
+  this.setState({etherbrights:_etherbrights });
+  // this.setState(this.state);
+  console.log("SET METHOD");
+}
 mintEtherbright = ()=>{
   this.state.contract.methods.mintEtherbright(this.state.account)
   .send({from: this.state.account ,gas:3000000})
@@ -285,6 +323,9 @@ getAllTokenId = ()=>{
       }
       )
 }
+
+update=()=>{this.forceUpdate();
+console.log(this.state.etherbrights)}
   // mint = (color) => {
   //   this.state.contract.mint(color)
   //   .call({from: this.state.account})
@@ -355,6 +396,8 @@ render() {
           <button onClick={this.mintEtherbright}>mint etherbright</button>
           <hr/>
           <button onClick={this.getAllTokenId}>get all token ID</button>
+           <hr/>
+          <button onClick={this.update}>update</button>
           {/*
           <hr/>
           <h1>JUNK</h1>
@@ -372,14 +415,21 @@ render() {
 
 
         <div className="row text-center">
+
+
           <div>
+
+
+
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
                 <EthbDisplay id={ethb.id} svg={ethb.svg} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)}/>
               </div>
             ))}
+
           </div>
+
 
         {/*  { this.state.colors.map(
             (color, key) => {
@@ -407,13 +457,17 @@ class EthbDisplay extends Component{
       svg: props.svg,
     };
   }
-
+componentWillReceiveProps(newProps){
+    this.setState({
+        location: newProps.location
+    })
+}
   render(){
     return(
       <div>
           <h1>ETHBDISPLAY</h1>
                 <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
-                Etherbright id: {this.state.id.toString()}
+                Etherbright id: {this.state.id.toHexString()}
               <h3>setPixelColor</h3>
               <form onSubmit={(event) => {
                 event.preventDefault()
