@@ -12,7 +12,9 @@ function Etherbright(id, svg,){
 }
 
     
-
+function  svgonclick(cx){
+  console.log("POOP ",cx.target.getAttributeNS(null,"fill"));
+};
   
 
 class App extends Component {
@@ -130,14 +132,14 @@ class App extends Component {
         }
 
         var _etherbrights = Object.assign(this.state.etherbrights);
-          var tmp;
+        var tmp;
         // _etherbrights[index].svg="<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/></svg>";
         // _etherbrights[index].svg=returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call().then(function(result){tmp=result;console.log(result)} );
-                _etherbrights[index].svg=event.returnValues[1]
+        _etherbrights[index].svg=event.returnValues[1]
 
-          console.log("tmp result ",tmp );
-  this.setState({etherbrights  :[] });
-  this.setState({etherbrights:_etherbrights });
+        console.log("tmp result ",tmp );
+        this.setState({etherbrights  :[] });
+          this.setState({etherbrights:_etherbrights });
 
               // this.setMethod(_etherbrights);
 
@@ -468,6 +470,9 @@ componentWillReceiveProps(newProps){
           <h1>ETHBDISPLAY</h1>
                 <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
                 Etherbright id: {this.state.id.toHexString()}
+            <svg width='100' height='100'>
+            <circle value={"test"} cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black' onClick  ={(e) => {svgonclick(e) ;}}/>
+            </svg>
               <h3>setPixelColor</h3>
               <form onSubmit={(event) => {
                 event.preventDefault()
@@ -479,14 +484,14 @@ componentWillReceiveProps(newProps){
                 <input
                   type='text'
                   className='form-control mb-1'
-                  placeholder='pallent n'
-                  ref={(input) => { this.paln = input }}
+                  placeholder='pixel number'
+                  ref={(input) => { this.pixn = input }}
                 />
                 <input
                   type='text'
                   className='form-control mb-1'
-                  placeholder='pixel number'
-                  ref={(input) => { this.pixn = input }}
+                  placeholder='pallent n'
+                  ref={(input) => { this.paln = input }}
                 />
                 <input
                   type='submit'
