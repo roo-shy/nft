@@ -4,17 +4,26 @@ import React, { Component } from 'react';
 import './App.css';
 import Web3 from 'web3';
 import Color from '../abis/Color.json'
+import { CirclePicker } from 'react-color';
 
-function Etherbright(id, svg,){
+
+function Etherbright(id, svg, mode, showSvg ){
   this.id=id;
   this.svg=svg;
+  this.showSvg=showSvg;
+  this.mode=0;
 
 }
 
     
-function  svgonclick(cx){
-  console.log("POOP ",cx.target.getAttributeNS(null,"fill"));
-};
+// function  svgonclick(e,id){
+//   console.log("Color ",e.target.getAttributeNS(null,"fill"));
+//   console.log("ID ",e.target.getAttributeNS(null,"id"));
+//   window.App.setEtherbrightPixelColor(e.target.getAttributeNS(null,"id"),0,0);
+
+// };
+
+
   
 
 class App extends Component {
@@ -84,28 +93,28 @@ class App extends Component {
       const returnContract = new web3.eth.Contract(abi, address)//creates a new version of this contract
       this.setState({ contract:returnContract })//sets it in state obj
       console.log("contract:",this.state.contract)
-      console.log("calling test return")
-      const testreturn=returnContract.methods.testReturn("this is a test").call({from: this.state.account})
-      console.log("testreturn ",testreturn)
+      // console.log("calling test return")
+      // const testreturn=returnContract.methods.testReturn("this is a test").call({from: this.state.account})
+      // console.log("testreturn ",testreturn)
       console.log("calling totalssupply")
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
       console.log("returntotalsupply",returntotalSupply.toString())
       console.log("state total supply",this.state.totalSupply)
       this.setState({ totalSupply:returntotalSupply }) //sets state var
-      var returnSVG = await returnContract.methods.generateSVG().call()
-      this.setState({svg:returnSVG})
+      // var returnSVG = await returnContract.methods.generateSVG().call()
+      // this.setState({svg:returnSVG})
       // const tmp="<svg><circle cx="50" cy="50" r="20" fill="#ff0000" stroke-width="9" stroke="black"/></svg>"
 
       // this.setState({svg:"<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/></svg>"})
-      console.log("SVG: ",this.state.svg)
+      // console.log("SVG: ",this.state.svg)
 
 
-      returnContract.events.SVGgenerated()
-      .on('data', (event) => {
-        console.log("SVG EVENT ",event);
-        this.setState({svg:event.returnValues[0]})
-      })
-      .on('error', console.error)
+      // returnContract.events.SVGgenerated()
+      // .on('data', (event) => {
+      //   console.log("SVG EVENT ",event);
+      //   this.setState({svg:event.returnValues[0]})
+      // })
+      // .on('error', console.error)
 
       returnContract.events.EtherbrightSVGgenerated()
       .on('data', (event) => {
@@ -163,12 +172,12 @@ class App extends Component {
       })
       .on('error', console.error)
 
-      returnContract.events.PixelChanged()
-      .on('data', (event) => {
-        console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
+      // returnContract.events.PixelChanged()
+      // .on('data', (event) => {
+      //   console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
 
-      })
-      .on('error', console.error)
+      // })
+      // .on('error', console.error)
 
       returnContract.events.EtherbrightMinted()
       .on('data', (event) => {
@@ -184,27 +193,27 @@ class App extends Component {
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
       .on('error',console.error);
 
-      returnContract.getPastEvents('PixelChanged', {
-          fromBlock: 0,
-          toBlock: 'latest'
-      }, function(error, events){ console.log(events); })
-      .then(function(events){
-          console.log(events) // same results as the optional callback above
-      });
+      // returnContract.getPastEvents('PixelChanged', {
+      //     fromBlock: 0,
+      //     toBlock: 'latest'
+      // }, function(error, events){ console.log(events); })
+      // .then(function(events){
+      //     console.log(events) // same results as the optional callback above
+      // });
 
 
-      returnContract.getPastEvents('SVGgenerated', {
-          fromBlock: 0,
-          toBlock: 'latest'
-      }, function(error, events){ 
-          console.log(events); 
-          // returnSVG= returnContract.methods.generateSVG().call();
-          // this.setState({svg:returnSVG});
+      // returnContract.getPastEvents('SVGgenerated', {
+      //     fromBlock: 0,
+      //     toBlock: 'latest'
+      // }, function(error, events){ 
+      //     console.log(events); 
+      //     // returnSVG= returnContract.methods.generateSVG().call();
+      //     // this.setState({svg:returnSVG});
 
-         })
-      .then(function(events){
-          console.log(events) // same results as the optional callback above
-      });
+      //    })
+      // .then(function(events){
+      //     console.log(events) // same results as the optional callback above
+      // });
 
 
 
@@ -233,7 +242,7 @@ class App extends Component {
         // console.log(this.state.allSVGs)
         // _svgmap.set(ethbID,ethbSVG);
         this.setState({
-          etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG)]
+          etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG,0,ethbSVG)]
         })
 
       }
@@ -312,6 +321,13 @@ setPixelColor = (n, color) =>{
 setEtherbrightPixelColor = (id, pixn, paln) => {
   this.state.contract.methods.setEtherbrightPixel(id, pixn, paln)
   .send({from: this.state.account, gas:3000000})
+}
+
+testsvgonclick=(e,id)=>{
+  console.log("Color ",e.target.getAttributeNS(null,"fill"))
+  console.log("ID ",e.target.getAttributeNS(null,"id"))
+  // window.App.setEtherbrightPixelColor(e.target.getAttributeNS(null,"id"),0,0)
+
 }
 getAllTokenId = ()=>{
   // var nTokens=this.state.contract.methods.totalSupply().call();
@@ -426,7 +442,7 @@ render() {
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
-                <EthbDisplay id={ethb.id} svg={ethb.svg} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)}/>
+                <EthbDisplay id={ethb.id} svg={ethb.svg} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
               </div>
             ))}
 
@@ -454,6 +470,7 @@ render() {
 class EthbDisplay extends Component{
   constructor(props){
     super(props);
+    // this.testsvgonclick=this.testsvgonclick.bind(this);
     this.state={
       id: props.id,
       svg: props.svg,
@@ -470,8 +487,10 @@ componentWillReceiveProps(newProps){
           <h1>ETHBDISPLAY</h1>
                 <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
                 Etherbright id: {this.state.id.toHexString()}
+
+
             <svg width='100' height='100'>
-            <circle value={"test"} cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black' onClick  ={(e) => {svgonclick(e) ;}}/>
+            <circle id={this.state.id.toHexString()} cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e) ;}}/>
             </svg>
               <h3>setPixelColor</h3>
               <form onSubmit={(event) => {

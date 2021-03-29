@@ -19,7 +19,26 @@ contract TestColor {
   	event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
   		event SVGgenerated(string SVG, address indexed by);
 
+          function getjunk() public view returns(uint){
+      return junk;
+    }
+  
+  function testReturn(string memory _returnString) public returns(string memory) {
+      // _mint(msg.sender, 1);
+      return _returnString;
+  }
 
+    function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
+        require(_start + 1 >= _start, "toUint8_overflow");
+        require(_bytes.length >= _start + 1 , "toUint8_outOfBounds");
+        uint8 tempUint;
+
+        assembly {
+            tempUint := mload(add(add(_bytes, 0x1), _start))
+        }
+
+        return tempUint;
+    }
 	function setPixel(uint  _pixn, string memory _pixcolor) public {
 		string memory  _priorColor=pixels[_pixn];
 		// string memory  _priorColor=pixels[0];

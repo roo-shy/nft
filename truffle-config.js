@@ -8,7 +8,7 @@ module.exports = {
   networks: {
     development: {
       websockets: true,
-      gas: 90000000,  // gas limit
+      gas: 99000000,  // gas limit
       gasPrice: 1,
       host: "127.0.0.1",
       port: 8545,
@@ -23,7 +23,7 @@ module.exports = {
       setttings: {
         optimizer: {
           enabled: true,
-          runs: 1500
+          runs: 1
         }
       }
     }

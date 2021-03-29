@@ -3,21 +3,16 @@ pragma solidity ^0.7.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "./TestColor.sol";
+// import "./TestColor.sol";
 
 
-contract Color is ERC721,Ownable,TestColor {
+contract Color is ERC721,Ownable {
 
 	string[] public colors;
-  	// uint junk = 10;
-  	// uint nPixX=3;
-  	// uint nPixY=3;
-  	// uint nPix=nPixX*nPixY;
-  	// string[] public pixels;
-  	// string[] public pallet; 
-  	// string[] public canvasSVG;
   	uint256 public numberOfEtherbrights = 0;
-
+  	uint nPixX=3;
+  	uint nPixY=3;
+  	uint nPix=nPixX*nPixY;
 
 	mapping(string => bool) _colorExists;
 	mapping (uint256 => Etherbright) allEtherbrights;
@@ -41,10 +36,10 @@ contract Color is ERC721,Ownable,TestColor {
 	
 	
 	constructor() ERC721("Color", "COLOR") public {
-		buildLut();
-		buildCanvas();
-		paintCanvas();
-		generateSVG();
+		// buildLut();
+		// buildCanvas();
+		// paintCanvas();
+		// generateSVG();
 		// geerateCanvasSVG();
   	}
 
@@ -68,19 +63,10 @@ contract Color is ERC721,Ownable,TestColor {
 
 	}
 	function buildEtherbright (uint256 tokenId ) internal {
-		// Etherbright memory ethb=allEtherbrights[tokenId];
-		// ethb.pallet=getPalletFromSeed(tokenId, 1);
+
 		setEtherbrightPallet(tokenId);
 		setAllEtherbrightPixels(tokenId);
 
-		// Etherbright memory ethb=allEtherbrights[tokenId];
-		// // ethb.pallet=getPalletFromSeed(tokenId, 1);
-		// setEthebrightPallet(tokenId);
-		// for(uint p=0; p<nPix; p++){
-		// 	ethb.setPixels.push(ethb.pallet[(p%3)+1]);
-		// 	ethb.mintPixels.push(ethb.pallet[(p%3)+1]);
-
-		// }
 
 	}
 	function setAllEtherbrightPixels (uint256 tokenId) internal {
@@ -117,6 +103,7 @@ contract Color is ERC721,Ownable,TestColor {
 
 	}
 	
+
     function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
         require(_start + 1 >= _start, "toUint8_overflow");
         require(_bytes.length >= _start + 1 , "toUint8_outOfBounds");
@@ -129,7 +116,6 @@ contract Color is ERC721,Ownable,TestColor {
         return tempUint;
     }
 
-
 	function setEtherbrightPixel (uint256 _tokenId,uint  _pixn, uint  _palletN ) public {
 		// Etherbright storage ethb =allEtherbrights[_tokenId];
 		string memory _priorColor=allEtherbrights[_tokenId].setPixels[_pixn];
@@ -139,7 +125,7 @@ contract Color is ERC721,Ownable,TestColor {
 		emit EtherbrightPixelChanged(_tokenId, _newSVG, _priorColor, _newColor, msg.sender);
 		
 	}
-	
+
 
   	function generateEtherbrightsSVG(uint256 _tokenId) public returns (string memory){
   		//returns the svg string of the canvas
@@ -164,82 +150,5 @@ contract Color is ERC721,Ownable,TestColor {
 
   	}
 
-
-
-  	
-
-
-
-
-	// function setPixel(uint  _pixn, string memory _pixcolor) public {
-	// 	string memory  _priorColor=pixels[_pixn];
-	// 	// string memory  _priorColor=pixels[0];
-	// 	pixels[_pixn]=_pixcolor;
-	// 	emit PixelChanged(_pixn,_priorColor,_pixcolor, msg.sender);
-	// 	generateSVG();
-		
-	// }
-	
-
-
-
-
-
-
-
-
-
-	
-  	
-
-
-
-
-
-  // 	function geerateCanvasSVG () public returns(string memory)  {
-  // 		string[] memory pixelholder;
-  // 		string memory canvasSVGheader="<svg width='100' height='100'>";
-  // 		string memory canvasSVGfooter="</svg>";
-  // 		 //attache header
-  // 		//iterate over the pixels and add generate individual strings
-  // 		//attach footer
-  // 		//pack and send
-  // 		canvasSVG.push(canvasSVGheader);
-  // 		for(uint p=0; p<nPix; p++){
-  // 			string pixSring=string()
-  // 			canvasSVG.push(pixels[p]);
-		// }	
-		// canvasSVG.push(canvasSVGfooter);
-		// return string(abi.encodePacked(canvasSVG));
-  		
-  // 	}
-  	
-  	// function concat (string memory array) returns(string memory) view internal {
-  		
-  	// }
-  	
-
-
-
-
-  	// function setPixelTick(uint memory _tick) public payable 
-
-    // function totalSupply
-    function getjunk() public view returns(uint){
-      return junk;
-    }
-  
-	function testReturn(string memory _returnString) public returns(string memory) {
-	    // _mint(msg.sender, 1);
-	    return _returnString;
-	}
-
-	// function mint(string memory _color) public {
-	//   require(!_colorExists[_color]);
-	//   colors.push(_color);
-	//   uint _id = colors.length-1;
-	//   _mint(msg.sender, _id);
-	//   _colorExists[_color] = true;
-	// }
 
 }
