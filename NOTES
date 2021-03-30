@@ -35,3 +35,30 @@ npm install -g ganache-cli
 GAS:
 gas limit = is the maximum gas youll pay per transaction
 gas price = the amout of gwei youll pay per unit of gas
+
+call() when not chagging the state of the contract
+send() when changing the state of the contract
+
+
+2_deploy_contract.js
+====================
+
+   Replacing 'Color'
+   -----------------
+   > transaction hash:    0x1b8fea0bc5a803be869b9b63dbcc8b02d73bfea41f541c58f18d4d9d2ac03ef7
+   > Blocks: 0            Seconds: 0
+   > contract address:    0xf847B156c840a95169048e2357735dDEA98E95dE
+   > block number:        3
+   > block timestamp:     1616449189
+   > account:             0x76e6FfC19E43Fe776074e680107043d2329Cc443
+   > balance:             99.999999999993199749
+   > gas used:            6537868 (0x63c28c)
+   > gas price:           0.000000001 gwei
+   > value sent:          0 ETH
+   > total cost:          0.000000000006537868 ETH
+
+
+   > Saving migration to chain.
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:     0.000000000006537868 ETH

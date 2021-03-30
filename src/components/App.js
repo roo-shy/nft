@@ -7,11 +7,11 @@ import Color from '../abis/Color.json'
 import { CirclePicker } from 'react-color';
 
 
-function Etherbright(id, svg, mode, showSvg ){
+function Etherbright(id, pixels, svg, mode ){
   this.id=id;
   this.svg=svg;
-  this.showSvg=showSvg;
   this.mode=0;
+  this.pixel=pixels;
 
 }
 
@@ -23,7 +23,19 @@ function Etherbright(id, svg, mode, showSvg ){
 
 // };
 
+function generateSvg(id, pixels){
+  var header="<svg width='100' height='100'>";
+  var footer="</svg>";
+  // var body
+  for(var p=0; p<24; p++){
+    var c=pixels[1];
+    var e="<circle id={this.state.id.toHexString()} cx='50' cy='50' r='20' fill="+c+" strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e) ;}}/>";
+    header=header.concat(e);
+  }
+  header.concat(footer);
+console.log("generateSVG  ",header)
 
+}
   
 
 class App extends Component {
@@ -179,15 +191,43 @@ class App extends Component {
       // })
       // .on('error', console.error)
 
+
+
+      // returnContract.events.EtherbrightMinted()
+      // .on('data', (event) => {
+      //   console.log("Etherbright Minted ",event);
+      //     var ethb=new Etherbright(event.returnValues[0],event.returnValues[1]);
+      //   this.setState({
+      //     etherbrights: [...this.state.etherbrights, ethb]
+      //   })
+      // })
+      // .on('error', console.error)
       returnContract.events.EtherbrightMinted()
       .on('data', (event) => {
         console.log("Etherbright Minted ",event);
-          var ethb=new Etherbright(event.returnValues[0],event.returnValues[1]);
+          var id=event.returnValues[0];
+          console.log(" minted id ",id)
+
+          var pixels=[];
+          var svg="tmp";
+          var waiting=1; 
+          for(var p=0; p<24; p++){
+            //when promis is returned the .then is called
+            var c= returnContract.methods.getEtherbrightPixelColor(id,p).call().then(function(result){pixels.push(result);waiting=0});
+            
+// svg= generateSvg(id,pixels);
+          }
+          console.log("WAIT", waiting);
+          console.log("PIXELS ",pixels);
+          var svg= generateSvg(id,pixels)
+          var ethb=new Etherbright(id, pixels, svg,0);
         this.setState({
           etherbrights: [...this.state.etherbrights, ethb]
         })
       })
       .on('error', console.error)
+
+
 
       returnContract.events.Transfer()
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})

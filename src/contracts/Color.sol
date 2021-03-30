@@ -10,8 +10,8 @@ contract Color is ERC721,Ownable {
 
 	string[] public colors;
   	uint256 public numberOfEtherbrights = 0;
-  	uint nPixX=3;
-  	uint nPixY=3;
+  	uint nPixX=5;
+  	uint nPixY=5;
   	uint nPix=nPixX*nPixY;
 
 	mapping(string => bool) _colorExists;
@@ -30,17 +30,14 @@ contract Color is ERC721,Ownable {
 	event ClearCanvas(address indexed by);
 	event ResetCanvas(address indexed by);
 	// event SVGgenerated(string SVG, address indexed by);
-	event EtherbrightMinted(uint256 tokenId, string svg, address mintedBy, uint256 nEtherbrights);
+	// event EtherbrightMinted(uint256 tokenId, string svg, address mintedBy, uint256 nEtherbrights);
+	event EtherbrightMinted(uint256 tokenId, address mintedBy, uint256 nEtherbrights);
 	event EtherbrightPixelChanged(uint256 tokenId, string svg, string from, string to, address indexed by);
 	event EtherbrightSVGgenerated(uint _tokenId, string svg, address indexed by);
 	
 	
 	constructor() ERC721("Color", "COLOR") public {
-		// buildLut();
-		// buildCanvas();
-		// paintCanvas();
-		// generateSVG();
-		// geerateCanvasSVG();
+
   	}
 
   	function mintEtherbright(address to) public{
@@ -57,8 +54,10 @@ contract Color is ERC721,Ownable {
 
 	  _mint(msg.sender, tokenId);
 	  numberOfEtherbrights+=1;
-	  string memory tmpsvg=generateEtherbrightsSVG(tokenId);
-	  emit EtherbrightMinted(tokenId, tmpsvg, to, numberOfEtherbrights);
+	  // string memory tmpsvg=generateEtherbrightsSVG(tokenId);
+	  emit EtherbrightMinted(tokenId, to, numberOfEtherbrights);
+
+	  // emit EtherbrightMinted(tokenId, tmpsvg, to, numberOfEtherbrights);
 	// event EtherbrightMinted(uint256 tokenId, address mintedBy, uint256 nEtherbrights, string svg);
 
 	}
@@ -86,12 +85,32 @@ contract Color is ERC721,Ownable {
   			allEtherbrights[tokenId].pallet.push("#ff0000");
 			allEtherbrights[tokenId].pallet.push("#00ff00");
 			allEtherbrights[tokenId].pallet.push("#0000ff");
+
+			// 			allEtherbrights[tokenId].pallet.push("#000000");
+  	// 		allEtherbrights[tokenId].pallet.push("#ff0000");
+			// allEtherbrights[tokenId].pallet.push("#00ff00");
+			// allEtherbrights[tokenId].pallet.push("#0000ff");
+			// 			allEtherbrights[tokenId].pallet.push("#000000");
+  	// 		allEtherbrights[tokenId].pallet.push("#ff0000");
+			// allEtherbrights[tokenId].pallet.push("#00ff00");
+			// allEtherbrights[tokenId].pallet.push("#0000ff");
+
 		}
 		else if(selector >= 85 && selector < 170 ){
 			allEtherbrights[tokenId].pallet.push("#000000");
   			allEtherbrights[tokenId].pallet.push("#ffff00");
 			allEtherbrights[tokenId].pallet.push("#00ffff");
 			allEtherbrights[tokenId].pallet.push("#ff00ff");
+			// 			allEtherbrights[tokenId].pallet.push("#000000");
+  	// 		allEtherbrights[tokenId].pallet.push("#ffff00");
+			// allEtherbrights[tokenId].pallet.push("#00ffff");
+			// allEtherbrights[tokenId].pallet.push("#ff00ff");
+			// 						allEtherbrights[tokenId].pallet.push("#000000");
+  	// 		allEtherbrights[tokenId].pallet.push("#ff0000");
+			// allEtherbrights[tokenId].pallet.push("#00ff00");
+			// allEtherbrights[tokenId].pallet.push("#0000ff");
+
+
 
 		}
 		else{
@@ -99,6 +118,16 @@ contract Color is ERC721,Ownable {
   			allEtherbrights[tokenId].pallet.push("#ffb300");
 			allEtherbrights[tokenId].pallet.push("#7a0008a");
 			allEtherbrights[tokenId].pallet.push("#02c0c7");
+			// 			allEtherbrights[tokenId].pallet.push("#000000");
+  	// 		allEtherbrights[tokenId].pallet.push("#ffb300");
+			// allEtherbrights[tokenId].pallet.push("#7a0008a");
+			// allEtherbrights[tokenId].pallet.push("#02c0c7");
+			// 						allEtherbrights[tokenId].pallet.push("#000000");
+  	// 		allEtherbrights[tokenId].pallet.push("#ff0000");
+			// allEtherbrights[tokenId].pallet.push("#00ff00");
+			// allEtherbrights[tokenId].pallet.push("#0000ff");
+
+
 		}
 
 	}
@@ -125,6 +154,10 @@ contract Color is ERC721,Ownable {
 		emit EtherbrightPixelChanged(_tokenId, _newSVG, _priorColor, _newColor, msg.sender);
 		
 	}
+	function getEtherbrightPixelColor (uint256 _tokenId,uint pn) public returns(string memory) {
+		return allEtherbrights[_tokenId].setPixels[pn];
+	}
+	
 
 
   	function generateEtherbrightsSVG(uint256 _tokenId) public returns (string memory){
