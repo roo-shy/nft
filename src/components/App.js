@@ -7,12 +7,20 @@ import Color from '../abis/Color.json'
 import { CirclePicker } from 'react-color';
 
 
-function Etherbright(id, pixels, svg, mode ){
+function Etherbright(id, xpos,ypos, pixels, svg, mode ){
   this.id=id;
   this.svg=svg;
   this.mode=0;
-  this.pixel=pixels;
+  this.pixels=pixels;
+  this.xpos=xpos;
+  this.ypos=ypos;
 
+}
+function Pixel(id,xpos,ypos,color){
+  this.id=id;
+  this.xpos=xpos;
+  this.ypos=ypos;
+  this.color=color;
 }
 
     
@@ -24,16 +32,29 @@ function Etherbright(id, pixels, svg, mode ){
 // };
 
 function generateSvg(id, pixels){
-  var header="<svg width='100' height='100'>";
+  var header="<svg width='300' height='300'>";
   var footer="</svg>";
   // var body
-  for(var p=0; p<24; p++){
-    var c=pixels[1];
-    var e="<circle id={this.state.id.toHexString()} cx='50' cy='50' r='20' fill="+c+" strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e) ;}}/>";
-    header=header.concat(e);
-  }
-  header.concat(footer);
-console.log("generateSVG  ",header)
+  var xoff=50;
+  var yoff=50;
+  var p=0;
+  // for(var p=0; p<24; p++){
+  //   var c=pixels[p];
+  //   var e="<circle id={this.state.id.toHexString()} cx='"+p+"' cy='50' r='20' fill="+c+" strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e) ;}}/>";
+  //   header=header.concat(e);
+  // }
+    for(var x=1; x<=5; x++){
+      for(var y=1; y<=5; y++){
+        // console.log("x:",x," y:",y," p:",p," c:",c);
+        var c=pixels[p];
+        var e="<circle id='"+id+"' cx='"+xoff*x+"' cy='"+yoff*y+"' r='20' fill="+c+" strokeWidth='10' stroke='black' onClick  ='{(e) => {this.props.testsvg(e);}}'/>";
+        header=header.concat(e);
+        p++;
+      } 
+    }
+  header=header.concat("</svg>");
+  return header;
+// console.log("generateSVG  ",header)
 
 }
   
@@ -210,22 +231,52 @@ class App extends Component {
 
           var pixels=[];
           var svg="tmp";
-          var waiting=1; 
+          var waiting=1;
+          var ethb=new Etherbright(); 
+          ethb.id=id;
+          var proms=[];
           for(var p=0; p<24; p++){
             //when promis is returned the .then is called
-            var c= returnContract.methods.getEtherbrightPixelColor(id,p).call().then(function(result){pixels.push(result);waiting=0});
-            
+            // returnContract.methods.getEtherbrightPixelColor(id,p).call().then(function(result){pixels.push(result);waiting=0}).finally(function(result){console.log("! ",pixels,id)});
+           // returnContract.methods.getEtherbrightPixelColor(id,p).call().then( function(result){ethb.pixels.push(result)})
+           proms.push(returnContract.methods.getEtherbrightPixelColor(id,p).call())
 // svg= generateSvg(id,pixels);
           }
-          console.log("WAIT", waiting);
-          console.log("PIXELS ",pixels);
-          var svg= generateSvg(id,pixels)
-          var ethb=new Etherbright(id, pixels, svg,0);
-        this.setState({
-          etherbrights: [...this.state.etherbrights, ethb]
-        })
+
+          var allProms=Promise.all(proms);
+            // allProms.then(data => {console.log("ALL PROMS ID ",id); console.log("prom data ",data)})
+            allProms.then((data) => {
+
+              console.log("ALL PROMS ID ",ethb.id); 
+                var xoff=50;
+               var yoff=50;
+                var p=0;
+                var pixels=[];
+                for(var x=1; x<=5; x++){
+                  for(var y=1; y<=5; y++){
+                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[p]))
+                    p++;
+                  }
+                }
+              ethb.pixels=pixels;
+              console.log("PIX ",ethb.pixels);
+              ethb.svg=generateSvg(ethb.id,ethb.pixels);
+              this.setState({
+                etherbrights: [...this.state.etherbrights, ethb]
+              })
+              // console.log("prom data ",data);
+              // console.log("supply ",this.state.totalSupply);
+
+              // console.log("generateSVG  ", ethb.svg)
+            })
+
+
+          // this.setState({
+          //   etherbrights: [...this.state.etherbrights, ethb]
+          // })
       })
       .on('error', console.error)
+
 
 
 
@@ -266,14 +317,17 @@ class App extends Component {
       // }
       // var _svgmap = new Map();
       for (var i = 1; i <= returntotalSupply; i++) {
+      var ethb=new Etherbright();
 
         var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
+        ethb.id=ethbID;
         // console.log("etcbs: ",ethb)
         // this.setState({
         //   etherbrightIDs: [...this.state.etherbrightIDs, ethb]
         // })
         
-        var ethbSVG = await returnContract.methods.generateEtherbrightsSVG(ethbID).call()
+        // var ethbSVG = "SVGJUNK";//await returnContract.methods.generateEtherbrightsSVG(ethbID).call()
+        // ethb.svg=ethbSVG;
         // console.log("svgs: ",returnedSVG)
 
         // this.setState({
@@ -281,9 +335,46 @@ class App extends Component {
         // })
         // console.log(this.state.allSVGs)
         // _svgmap.set(ethbID,ethbSVG);
-        this.setState({
-          etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG,0,ethbSVG)]
-        })
+
+        // Etherbright(id, xpos,ypos, pixels, svg, mode )
+        var proms=[];
+        var pixels=[];
+              console.log(" startup ALL PROMS ID 1",ethb.id); 
+
+        for(var p=0; p<24; p++){
+          proms.push(returnContract.methods.getEtherbrightPixelColor(ethb.id,p).call())
+        }
+        var allProms=Promise.all(proms);
+            allProms.then((data) => {
+
+              console.log(" startup ALL PROMS ID 2",ethbID); 
+                var xoff=50;
+                var yoff=50;
+                var p=0;
+                var pixels=[];
+                for(var x=1; x<=5; x++){
+                  for(var y=1; y<=5; y++){
+                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[p]))
+                    p++;
+                  }
+                }
+              ethb.pixels=pixels;
+              // console.log("PIX ",ethb.pixels);
+              ethb.svg=generateSvg(ethb.id,ethb.pixels);
+              ethb.id=ethbID;
+              this.setState({
+                etherbrights: [...this.state.etherbrights, ethb]
+              })
+              // console.log("prom data ",data);
+              // console.log("supply ",this.state.totalSupply);
+
+              // console.log("generateSVG  ", ethb.svg)
+            },ethbID)
+
+
+        // this.setState({
+        //   etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG,0,ethbSVG)]
+        // })
 
       }
       // this.setState({SVGmap:_svgmap})
@@ -482,7 +573,7 @@ render() {
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
-                <EthbDisplay id={ethb.id} svg={ethb.svg} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
+                <EthbDisplay id={ethb.id} pixels={ethb.pixels} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
               </div>
             ))}
 
@@ -513,25 +604,48 @@ class EthbDisplay extends Component{
     // this.testsvgonclick=this.testsvgonclick.bind(this);
     this.state={
       id: props.id,
-      svg: props.svg,
+      pixels: props.pixels,
     };
   }
-componentWillReceiveProps(newProps){
-    this.setState({
-        location: newProps.location
-    })
-}
+  componentWillReceiveProps(newProps){
+      this.setState({
+          location: newProps.location
+      })
+  }
+
+  getCircle(x,y,c){
+    return(
+            <circle id={this.state.id.toHexString()} cx={x} cy={y} r='20' fill={c} strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
+      )
+  }
   render(){
     return(
       <div>
           <h1>ETHBDISPLAY</h1>
                 <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
                 Etherbright id: {this.state.id.toHexString()}
+                Etherbright pix: {this.state.pixels[0].xpos}
 
 
-            <svg width='100' height='100'>
-            <circle id={this.state.id.toHexString()} cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e) ;}}/>
-            </svg>
+            <svg width='300' height='300'>
+            <circle cx='60' cy='90' r='20' fill='#93hf93' stroke-width='9' stroke='black'/>
+            
+ 
+              {
+
+                this.state.pixels.map(pix=>(  this.getCircle(pix.xpos,pix.ypos,pix.color) ))
+                
+
+                }
+
+       </svg>
+              
+              
+
+
+              
+
+            
               <h3>setPixelColor</h3>
               <form onSubmit={(event) => {
                 event.preventDefault()
