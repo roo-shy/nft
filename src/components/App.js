@@ -7,11 +7,13 @@ import Color from '../abis/Color.json'
 import { CirclePicker } from 'react-color';
 
 
-function Etherbright(id, xpos,ypos, pixels, svg, mode ){
+function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner ){
   this.id=id;
+  this.owner=owner;
   this.svg=svg;
   this.mode=0;
   this.pixels=pixels;
+  this.pallent=pallet;
   this.xpos=xpos;
   this.ypos=ypos;
 
@@ -22,6 +24,7 @@ function Pixel(id,xpos,ypos,color){
   this.ypos=ypos;
   this.color=color;
 }
+
 
     
 // function  svgonclick(e,id){
@@ -75,6 +78,7 @@ class App extends Component {
       allSVGs: [],
 
     }
+
   }
 
   async loadWeb3() {
@@ -149,12 +153,12 @@ class App extends Component {
       // })
       // .on('error', console.error)
 
-      returnContract.events.EtherbrightSVGgenerated()
-      .on('data', (event) => {
-        console.log("ETHB SVG EVENT ",event);
-        // this.setState({svg:event.returnValues[0]})
-      })
-      .on('error', console.error)
+      // returnContract.events.EtherbrightSVGgenerated()
+      // .on('data', (event) => {
+      //   console.log("ETHB SVG EVENT ",event);
+      //   // this.setState({svg:event.returnValues[0]})
+      // })
+      // .on('error', console.error)
 
       returnContract.events.EtherbrightPixelChanged()
       .on('data', (event) => {
@@ -165,7 +169,7 @@ class App extends Component {
         for (var index = 0; index < this.state.etherbrights.length; index++) {
           console.log("index ",index);
           console.log("state ID ",this.state.etherbrights[index].id.toHexString());
-          console.log("event id ",event.returnValues[0].toHexString());
+          console.log("token id ",event.returnValues[0].toHexString());
 
           if (this.state.etherbrights[index].id.toHexString() === event.returnValues[0].toHexString()) {
             console.log("THIS IS IT")
@@ -175,9 +179,9 @@ class App extends Component {
 
         var _etherbrights = Object.assign(this.state.etherbrights);
         var tmp;
-        // _etherbrights[index].svg="<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/></svg>";
-        // _etherbrights[index].svg=returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call().then(function(result){tmp=result;console.log(result)} );
-        _etherbrights[index].svg=event.returnValues[1]
+        var pixN=event.returnValues[1];
+        // _etherbrights[index].svg=event.returnValues[1]
+        _etherbrights[index].pixels[pixN].color=event.returnValues[3];
 
         console.log("tmp result ",tmp );
         this.setState({etherbrights  :[] });
@@ -227,6 +231,7 @@ class App extends Component {
       .on('data', (event) => {
         console.log("Etherbright Minted ",event);
           var id=event.returnValues[0];
+          var owner=event.returnValues[1];
           console.log(" minted id ",id)
 
           var pixels=[];
@@ -234,18 +239,18 @@ class App extends Component {
           var waiting=1;
           var ethb=new Etherbright(); 
           ethb.id=id;
+          ethb.owner=owner;
           var proms=[];
-          for(var p=0; p<24; p++){
-            //when promis is returned the .then is called
-            // returnContract.methods.getEtherbrightPixelColor(id,p).call().then(function(result){pixels.push(result);waiting=0}).finally(function(result){console.log("! ",pixels,id)});
-           // returnContract.methods.getEtherbrightPixelColor(id,p).call().then( function(result){ethb.pixels.push(result)})
-           proms.push(returnContract.methods.getEtherbrightPixelColor(id,p).call())
-// svg= generateSvg(id,pixels);
-          }
-
+          var pixelColors=[];
+          // returnContract.methods.getEtherbrightPallet(id).call().then(function(result){ethb.pallet=result;console.log("PALLET ",result)});
+          // returnContract.methods.getEtherbrightPixels(id).call().then(function(result){pixelColors=result;console.log("PALLET ",result)});
+          proms.push(returnContract.methods.getEtherbrightPallet(id).call());
+          proms.push(returnContract.methods.getEtherbrightPixels(id).call());
           var allProms=Promise.all(proms);
-            // allProms.then(data => {console.log("ALL PROMS ID ",id); console.log("prom data ",data)})
             allProms.then((data) => {
+              console.log("DATA 0",data[0])
+              ethb.pallet=data[0];
+              console.log("ethb.pallet ",ethb.pallet)
 
               console.log("ALL PROMS ID ",ethb.id); 
                 var xoff=50;
@@ -254,26 +259,70 @@ class App extends Component {
                 var pixels=[];
                 for(var x=1; x<=5; x++){
                   for(var y=1; y<=5; y++){
-                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[p]))
+                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[1][p]))
                     p++;
                   }
                 }
               ethb.pixels=pixels;
-              console.log("PIX ",ethb.pixels);
-              ethb.svg=generateSvg(ethb.id,ethb.pixels);
-              this.setState({
-                etherbrights: [...this.state.etherbrights, ethb]
-              })
-              // console.log("prom data ",data);
-              // console.log("supply ",this.state.totalSupply);
 
-              // console.log("generateSVG  ", ethb.svg)
+              console.log("PIX ",ethb.pixels);
+              console.log("PALLET ",ethb.pallet);
+
+              // ethb.svg=generateSvg(ethb.id,ethb.pixels);
+              this.setState({
+              etherbrights: [...this.state.etherbrights, ethb]
+              })
             })
 
+          // for(var p=0; p<24; p++){
+          //  proms.push(returnContract.methods.getEtherbrightPixelColor(id,p).call())
+          // }
 
-          // this.setState({
-          //   etherbrights: [...this.state.etherbrights, ethb]
-          // })
+          // var allProms=Promise.all(proms);
+          //   allProms.then((data) => {
+
+          //     console.log("ALL PROMS ID ",ethb.id); 
+          //       var xoff=50;
+          //      var yoff=50;
+          //       var p=0;
+          //       var pixels=[];
+          //       for(var x=1; x<=5; x++){
+          //         for(var y=1; y<=5; y++){
+          //           pixels.push(new Pixel(p,xoff*x,yoff*y,data[p]))
+          //           p++;
+          //         }
+          //       }
+          //     ethb.pixels=pixels;
+
+          //     console.log("PIX ",ethb.pixels);
+          //     console.log("PALLET ",ethb.pallet);
+
+          //     ethb.svg=generateSvg(ethb.id,ethb.pixels);
+          //     this.setState({
+          //     etherbrights: [...this.state.etherbrights, ethb]
+          //     })
+          //   })
+
+
+            //     var xoff=50;
+            //    var yoff=50;
+            //     var p=0;
+            //     var pixels=[];
+            //     for(var x=1; x<=5; x++){
+            //       for(var y=1; y<=5; y++){
+            //         pixels.push(new Pixel(p,xoff*x,yoff*y,pixelColors[p]))
+            //         p++;
+            //       }
+            //     }
+            //   ethb.pixels=pixels;
+            //   console.log("PIX ",ethb.pixels);
+            //   console.log("PALLET ",ethb.pallet);
+
+            //   ethb.svg=generateSvg(ethb.id,ethb.pixels);
+            //   this.setState({
+            //   etherbrights: [...this.state.etherbrights, ethb]
+            // })
+   
       })
       .on('error', console.error)
 
@@ -320,41 +369,28 @@ class App extends Component {
       var ethb=new Etherbright();
 
         var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
+        var owner =await returnContract.methods.ownerOf(ethbID).call();
         ethb.id=ethbID;
-        // console.log("etcbs: ",ethb)
-        // this.setState({
-        //   etherbrightIDs: [...this.state.etherbrightIDs, ethb]
-        // })
-        
-        // var ethbSVG = "SVGJUNK";//await returnContract.methods.generateEtherbrightsSVG(ethbID).call()
-        // ethb.svg=ethbSVG;
-        // console.log("svgs: ",returnedSVG)
-
-        // this.setState({
-        //   allSVGs:[...this.state.allSVGs,returnedSVG]
-        // })
-        // console.log(this.state.allSVGs)
-        // _svgmap.set(ethbID,ethbSVG);
-
-        // Etherbright(id, xpos,ypos, pixels, svg, mode )
+        ethb.owner=owner;
         var proms=[];
         var pixels=[];
-              console.log(" startup ALL PROMS ID 1",ethb.id); 
+              // console.log(" startup ALL PROMS ID 1",ethb.id); 
 
-        for(var p=0; p<24; p++){
-          proms.push(returnContract.methods.getEtherbrightPixelColor(ethb.id,p).call())
-        }
+        // for(var p=0; p<24; p++){
+        //   proms.push(returnContract.methods.getEtherbrightPixelColor(ethb.id,p).call())
+        // }
+        proms.push(returnContract.methods.getEtherbrightPixels(ethbID).call());
         var allProms=Promise.all(proms);
             allProms.then((data) => {
 
-              console.log(" startup ALL PROMS ID 2",ethbID); 
+              // console.log(" startup ALL PROMS ID 2",ethbID); 
                 var xoff=50;
                 var yoff=50;
                 var p=0;
                 var pixels=[];
                 for(var x=1; x<=5; x++){
                   for(var y=1; y<=5; y++){
-                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[p]))
+                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[0][p]))
                     p++;
                   }
                 }
@@ -362,6 +398,8 @@ class App extends Component {
               // console.log("PIX ",ethb.pixels);
               ethb.svg=generateSvg(ethb.id,ethb.pixels);
               ethb.id=ethbID;
+              ethb.owner=owner;
+
               this.setState({
                 etherbrights: [...this.state.etherbrights, ethb]
               })
@@ -372,13 +410,9 @@ class App extends Component {
             },ethbID)
 
 
-        // this.setState({
-        //   etherbrights:[...this.state.etherbrights,new Etherbright(ethbID,ethbSVG,0,ethbSVG)]
-        // })
-
       }
       // this.setState({SVGmap:_svgmap})
-      console.log("allsvgs",this.state.allSVGs)
+      // console.log("allsvgs",this.state.allSVGs)
       // console.log("MAP", this.state.svgmap)
     } else {
       window.alert('Smart contract not deployed to detected network.')
@@ -455,6 +489,7 @@ setEtherbrightPixelColor = (id, pixn, paln) => {
 }
 
 testsvgonclick=(e,id)=>{
+  console.log("Pix N ",e.target.getAttributeNS(null,"pn"))
   console.log("Color ",e.target.getAttributeNS(null,"fill"))
   console.log("ID ",e.target.getAttributeNS(null,"id"))
   // window.App.setEtherbrightPixelColor(e.target.getAttributeNS(null,"id"),0,0)
@@ -573,7 +608,7 @@ render() {
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
-                <EthbDisplay id={ethb.id} pixels={ethb.pixels} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
+                <EthbDisplay id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
               </div>
             ))}
 
@@ -605,6 +640,8 @@ class EthbDisplay extends Component{
     this.state={
       id: props.id,
       pixels: props.pixels,
+      owner: props.owner,
+
     };
   }
   componentWillReceiveProps(newProps){
@@ -612,35 +649,27 @@ class EthbDisplay extends Component{
           location: newProps.location
       })
   }
+  getAllColors(){
+    return (this.state.pixels.color)
+  }
 
-  getCircle(x,y,c){
+  getCircle(n,x,y,c){
     return(
-            <circle id={this.state.id.toHexString()} cx={x} cy={y} r='20' fill={c} strokeWidth='9' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
+            <circle id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
       )
   }
   render(){
     return(
-      <div>
-          <h1>ETHBDISPLAY</h1>
-                <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
-                Etherbright id: {this.state.id.toHexString()}
-                Etherbright pix: {this.state.pixels[0].xpos}
-
-
+      <div >
             <svg width='300' height='300'>
-            <circle cx='60' cy='90' r='20' fill='#93hf93' stroke-width='9' stroke='black'/>
-            
- 
-              {
-
-                this.state.pixels.map(pix=>(  this.getCircle(pix.xpos,pix.ypos,pix.color) ))
-                
-
-                }
-
-       </svg>
-              
-              
+            {this.state.pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
+            </svg>
+                      <div align="left">
+            <h5>Etherbright id:</h5> <h6> {this.state.id.toHexString()}</h6>
+            <br/>
+            <h5>Etherbright owner:</h5> {this.state.owner}
+            </div>  
+              <CirclePicker colors={this.getAllColors()}/>
 
 
               
