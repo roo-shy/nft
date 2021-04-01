@@ -13,7 +13,7 @@ function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner ){
   this.svg=svg;
   this.mode=0;
   this.pixels=pixels;
-  this.pallent=pallet;
+  this.pallet=pallet;
   this.xpos=xpos;
   this.ypos=ypos;
 
@@ -145,6 +145,11 @@ class App extends Component {
       // this.setState({svg:"<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/></svg>"})
       // console.log("SVG: ",this.state.svg)
 
+      returnContract.events.Selector()
+      .on('data', (event) => {
+        console.log("SELECTOR: ",event.returnValues[0]);
+      })
+      .on('error', console.error)
 
       // returnContract.events.SVGgenerated()
       // .on('data', (event) => {
@@ -608,7 +613,7 @@ render() {
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
               <hr/>
-                <EthbDisplay id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
+                <EthbDisplay id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} pallet={ethb.pallet} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
               </div>
             ))}
 
@@ -641,6 +646,7 @@ class EthbDisplay extends Component{
       id: props.id,
       pixels: props.pixels,
       owner: props.owner,
+      pallet: props.pallet,
 
     };
   }
@@ -650,7 +656,7 @@ class EthbDisplay extends Component{
       })
   }
   getAllColors(){
-    return (this.state.pixels.color)
+    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ",this.state.pallet);
   }
 
   getCircle(n,x,y,c){

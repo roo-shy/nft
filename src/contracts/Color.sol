@@ -33,7 +33,7 @@ contract Color is ERC721,Ownable {
 	event EtherbrightMinted(uint256 tokenId, address mintedBy, uint256 nEtherbrights);
 	event EtherbrightPixelChanged(uint256 tokenId, uint pn, string from, string to, address indexed by);
 	// event EtherbrightSVGgenerated(uint _tokenId, string svg, address indexed by);
-	
+	event Selector(uint8 selector);
 	
 	constructor() ERC721("Color", "COLOR") public {
 
@@ -68,18 +68,86 @@ contract Color is ERC721,Ownable {
 
 	}
 	function setAllEtherbrightPixels (uint256 tokenId) internal {
-		for(uint p=0; p<nPix; p++){
-			allEtherbrights[tokenId].setPixels.push(allEtherbrights[tokenId].pallet[(p%3)+1]);
-			allEtherbrights[tokenId].mintPixels.push(allEtherbrights[tokenId].pallet[(p%3)+1]);
+		// uint8 selector=toUint8(abi.encodePacked(tokenId), 2);
+		uint8 start=selectorTo16Range(toUint8(abi.encodePacked(tokenId), 2));
+		uint8 mod=selectorTo5Range(toUint8(abi.encodePacked(tokenId), 4));
+		uint8 len=uint8(allEtherbrights[tokenId].pallet.length);
+        emit Selector(start);
+        emit Selector(mod);
+        emit Selector(len-1);
+		uint8 c=(start)%(len-1);
+		uint cnt=0;
+		for(uint8 p=0; p<nPix; p++){
+			// uint c=((start+p)%mod)+1;
+			// uint8 c=(start+mod+p)%(len-1);
+			emit Selector(c);
+			cnt++;
+
+			allEtherbrights[tokenId].setPixels.push(allEtherbrights[tokenId].pallet[c]);
+			allEtherbrights[tokenId].mintPixels.push(allEtherbrights[tokenId].pallet[c]);
+			c=(c+mod)%(len-1);
+			if((cnt%mod)==0){
+				c=start%(len-1);
+				cnt=0;
+			}
 
 		}
 	}
 	
+	function selectorTo5Range(uint a) internal pure returns (uint8) {
+		if(a>= 0 && a <51){
+			return 3;
+		}else if(a>=51 && a< 102){
+			return 4;
+		}else if(a>=102 && a< 153){
+			return 5;			
+		}else if(a>=153 && a< 204){
+			return 6;			
+		}else if(a>=204){
+			return 7;			
+		}
+	}
+	function selectorTo16Range(uint a) internal pure returns (uint8) {
+		if(a>= 0 && a <16){
+			return 0;
+		}else if(a>=16 && a< 32){
+			return 1;
+		}else if(a>=32 && a< 48){
+			return 2;			
+		}else if(a>=48 && a< 64){
+			return 3;			
+		}else if(a>=64 && a< 80){
+			return 4;			
+		}else if(a>=80 && a< 96){
+			return 5;			
+		}else if(a>=96 && a< 112){
+			return 6;			
+		}else if(a>=112 && a< 128){
+			return 7;		
+		}else if(a>=128 && a< 144){
+			return 8;			
+		}else if(a>=144 && a< 160){
+			return 9;
+		}else if(a>=160 && a< 178){
+			return 10;			
+		}else if(a>=178 && a< 192){
+			return 11;			
+		}else if(a>=192 && a< 208){
+			return 12;			
+		}else if(a>=208 && a< 224){
+			return 13;			
+		}else if(a>=224 && a< 240){
+			return 14;			
+		}else if(a>=240 && a< 256){
+			return 15;		
+		}
+
+	}
 
 	function setEtherbrightPallet (uint256 tokenId)  internal {
 		// Etherbright memory ethb=allEtherbrights[tokenId];
 		uint8 selector=toUint8(abi.encodePacked(tokenId), 1);
-		if(selector >= 0 && selector < 85 ){
+		if(selector >= 0 && selector < 54 ){
 			allEtherbrights[tokenId].pallet.push("#000000");
   			allEtherbrights[tokenId].pallet.push("#ff0000");
 			allEtherbrights[tokenId].pallet.push("#ff7700");
@@ -99,7 +167,7 @@ contract Color is ERC721,Ownable {
 			allEtherbrights[tokenId].pallet.push("#ff00f7");
 
 		}
-		else if(selector >= 85 && selector < 95 ){
+		else if(selector >= 54 && selector < 65 ){
 			allEtherbrights[tokenId].pallet.push("#000000");
   			allEtherbrights[tokenId].pallet.push("#ff7575");
 			allEtherbrights[tokenId].pallet.push("#ff75cf");
@@ -119,7 +187,7 @@ contract Color is ERC721,Ownable {
 			allEtherbrights[tokenId].pallet.push("#ff9575");
 
 		}
-		else if(selector >=95 && selector< 195){
+		else if(selector >=65 && selector< 200){
 			allEtherbrights[tokenId].pallet.push("#000000");
 			allEtherbrights[tokenId].pallet.push("#fffb00");
 			allEtherbrights[tokenId].pallet.push("#04ff00");
@@ -153,7 +221,8 @@ contract Color is ERC721,Ownable {
 	}
 	
 
-    function toUint8(bytes memory _bytes, uint256 _start) internal pure returns (uint8) {
+    function toUint8(bytes memory _bytes, uint256 _start) internal  returns (uint8) {
+    	//set this back to pure at some point
         require(_start + 1 >= _start, "toUint8_overflow");
         require(_bytes.length >= _start + 1 , "toUint8_outOfBounds");
         uint8 tempUint;
