@@ -385,6 +385,7 @@ class App extends Component {
         //   proms.push(returnContract.methods.getEtherbrightPixelColor(ethb.id,p).call())
         // }
         proms.push(returnContract.methods.getEtherbrightPixels(ethbID).call());
+        proms.push(returnContract.methods.getEtherbrightPallet(ethbID).call());
         var allProms=Promise.all(proms);
             allProms.then((data) => {
 
@@ -404,7 +405,7 @@ class App extends Component {
               ethb.svg=generateSvg(ethb.id,ethb.pixels);
               ethb.id=ethbID;
               ethb.owner=owner;
-
+ethb.pallet=data[1];
               this.setState({
                 etherbrights: [...this.state.etherbrights, ethb]
               })
@@ -657,6 +658,10 @@ class EthbDisplay extends Component{
   }
   getAllColors(){
     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ",this.state.pallet);
+    return(
+      this.state.pallet
+      )
+    
   }
 
   getCircle(n,x,y,c){
