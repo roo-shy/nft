@@ -39,6 +39,14 @@ gas price = the amout of gwei youll pay per unit of gas
 call() when not chagging the state of the contract
 send() when changing the state of the contract
 
+TESTNET
+https://docs.openzeppelin.com/learn/connecting-to-public-test-networks?pref=truffle
+https://dashboard.alchemyapi.io/apps/cw5sj9y6sxpkowyb
+
+https://www.geeksforgeeks.org/deploying-smart-contract-on-test-main-network-using-truffle/
+https://faucet.ropsten.be/
+npx truffle migrate --network ropsten
+
 
 2_deploy_contract.js
 ====================

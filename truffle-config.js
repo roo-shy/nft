@@ -1,6 +1,7 @@
 require('babel-register');
 require('babel-polyfill');
-
+const { alchemyApiKey, mnemonic } = require('./secrets.json');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 //gas is gas limit
 // gasPrice is the price
 
@@ -13,6 +14,14 @@ module.exports = {
       host: "127.0.0.1",
       port: 8545,
       network_id: "5777" // Match any network id
+    },
+   ropsten: {
+         provider: () => new HDWalletProvider(`apart frequent rabbit leisure credit earth report faint assist defy now fashion`, `wss://ropsten.infura.io/ws/v3/4499efec5f8f4aacaf7988bac139d9d3`),
+         network_id: 3,       // Ropsten's id
+         gas: 7000000 ,        // Ropsten has a lower block limit than mainnet
+         confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+         timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+         skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
   },
   contracts_directory: './src/contracts/',

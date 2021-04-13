@@ -88,7 +88,9 @@ class App extends Component {
             console.log("loadWeb3  ETH");
 
       // window.web3 = new Web3(window.ethereum)
-            window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
+            // window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545')) //USED WITH GANACHE CLI
+      window.web3Socket = new Web3(new Web3.providers.WebsocketProvider('wss://ropsten.infura.io/ws/v3/4499efec5f8f4aacaf7988bac139d9d3')) //USED WITH GANACHE CLI
+      window.web3=new Web3(window.ethereum)
 
       await window.ethereum.enable()
     }
@@ -96,7 +98,9 @@ class App extends Component {
                   console.log("loadWeb3  WEB3");
 
       // window.web3 = new Web3(window.web3.currentProvider)
-      window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))
+      // window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545'))//USED WITH GANACHE CLI
+            window.web3 = new Web3(new Web3.providers.WebsocketProvider('wss://ropsten.infura.io/ws/v3/4499efec5f8f4aacaf7988bac139d9d3'))//USED WITH GANACHE CLI
+
     }
     else {
       window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
@@ -115,7 +119,10 @@ class App extends Component {
   async loadBlockchainData() {
     const web3 = window.web3
     // Load account
-    const accounts = await web3.eth.getAccounts() //gets accout from metamask
+    // const accounts = await web3.eth.getAccounts() //gets accout from metamask
+        const accounts = await window.mm.eth.getAccounts() //gets accout from metamask
+
+    console.log("account: ",accounts)
     this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
     const networkId = await web3.eth.net.getId() //detercts the eth network 
     const networkData = Color.networks[networkId] //gets the contracts address on the network
@@ -127,7 +134,8 @@ class App extends Component {
       console.log("addy",address);
       console.log("abi:",abi);
 
-      const returnContract = new web3.eth.Contract(abi, address)//creates a new version of this contract
+      // const returnContract = new web3.eth.Contract(abi, address)//creates a new version of this contract
+      const returnContract = new web3.eth.Contract(abi,"0xD60F684458C8994570f9bF9FEa60F86e21317D11")
       this.setState({ contract:returnContract })//sets it in state obj
       console.log("contract:",this.state.contract)
       // console.log("calling test return")
@@ -478,6 +486,7 @@ mint = (color) => {
   console.log("SET METHOD");
 }
 mintEtherbright = ()=>{
+  console.log("MINTETHERBRIGHT account: ",this.state.account)
   this.state.contract.methods.mintEtherbright(this.state.account)
   .send({from: this.state.account ,gas:3000000})
 }
@@ -648,7 +657,6 @@ class EthbDisplay extends Component{
       pixels: props.pixels,
       owner: props.owner,
       pallet: props.pallet,
-
     };
   }
   componentWillReceiveProps(newProps){
@@ -657,7 +665,7 @@ class EthbDisplay extends Component{
       })
   }
   getAllColors(){
-    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ",this.state.pallet);
+    // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ",this.state.pallet);
     return(
       this.state.pallet
       )

@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 // import "./TestColor.sol";
 
 
-contract Color is ERC721,Ownable {
+contract Color is ERC721, Ownable {
 
   	uint256 public numberOfEtherbrights = 0;
   	uint nPixX=5;
@@ -25,7 +25,7 @@ contract Color is ERC721,Ownable {
 	}
 	
 	
-	// event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
+	event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
 	event ClearCanvas(address indexed by);
 	event ResetCanvas(address indexed by);
 	// event SVGgenerated(string SVG, address indexed by);
