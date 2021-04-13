@@ -70,6 +70,7 @@ class App extends Component {
     this.state={
       account:'',
       contract: null,
+      contractSocket:null,
       totalSupply: 1,
       svg:'', 
       colors: [],
@@ -90,7 +91,7 @@ class App extends Component {
       // window.web3 = new Web3(window.ethereum)
             // window.web3 = new Web3(new Web3.providers.WebsocketProvider('ws://localhost:8545')) //USED WITH GANACHE CLI
       window.web3Socket = new Web3(new Web3.providers.WebsocketProvider('wss://ropsten.infura.io/ws/v3/4499efec5f8f4aacaf7988bac139d9d3')) //USED WITH GANACHE CLI
-      window.web3=new Web3(window.ethereum)
+      window.web3=new Web3(window.ethereum)//was mm
 
       await window.ethereum.enable()
     }
@@ -118,9 +119,10 @@ class App extends Component {
 
   async loadBlockchainData() {
     const web3 = window.web3
+    const web3Socket = window.web3Socket
     // Load account
-    // const accounts = await web3.eth.getAccounts() //gets accout from metamask
-        const accounts = await window.mm.eth.getAccounts() //gets accout from metamask
+    const accounts = await web3.eth.getAccounts() //gets accout from metamask
+        // const accounts = await window.mm.eth.getAccounts() //gets accout from metamask
 
     console.log("account: ",accounts)
     this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
@@ -138,6 +140,7 @@ class App extends Component {
       const returnContract = new web3.eth.Contract(abi,"0xD60F684458C8994570f9bF9FEa60F86e21317D11")
       this.setState({ contract:returnContract })//sets it in state obj
       console.log("contract:",this.state.contract)
+      const returnContractSocket = new web3Socket.eth.Contract(abi,"0xD60F684458C8994570f9bF9FEa60F86e21317D11")
       // console.log("calling test return")
       // const testreturn=returnContract.methods.testReturn("this is a test").call({from: this.state.account})
       // console.log("testreturn ",testreturn)
@@ -153,7 +156,7 @@ class App extends Component {
       // this.setState({svg:"<svg width='100' height='100'><circle cx='50' cy='50' r='20' fill='#ffff00' stroke-width='9' stroke='black'/></svg>"})
       // console.log("SVG: ",this.state.svg)
 
-      returnContract.events.Selector()
+      returnContractSocket.events.Selector()
       .on('data', (event) => {
         console.log("SELECTOR: ",event.returnValues[0]);
       })
@@ -173,7 +176,7 @@ class App extends Component {
       // })
       // .on('error', console.error)
 
-      returnContract.events.EtherbrightPixelChanged()
+      returnContractSocket.events.EtherbrightPixelChanged()
       .on('data', (event) => {
         console.log("ETHB PIXEL CHANGED EVENT ",event);
           // returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call()
@@ -240,7 +243,7 @@ class App extends Component {
       //   })
       // })
       // .on('error', console.error)
-      returnContract.events.EtherbrightMinted()
+      returnContractSocket.events.EtherbrightMinted()
       .on('data', (event) => {
         console.log("Etherbright Minted ",event);
           var id=event.returnValues[0];
@@ -342,7 +345,7 @@ class App extends Component {
 
 
 
-      returnContract.events.Transfer()
+      returnContractSocket.events.Transfer()
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
       .on('error',console.error);
 
