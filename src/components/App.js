@@ -387,8 +387,8 @@ class App extends Component {
       //   })
       // }
       // var _svgmap = new Map();
-      for (var i = 1; i <= returntotalSupply; i++) {
-        var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
+      for (var i = 0; i < returntotalSupply; i++) {
+        var ethbID = await returnContract.methods.tokenByIndex(i).call()
         var owner =await returnContract.methods.ownerOf(ethbID).call();
         // ethb.id=ethbID;
         // ethb.owner=owner;
@@ -405,7 +405,7 @@ class App extends Component {
         var allProms=Promise.all(proms);
             allProms.then((data) => {
 
-              // console.log(" startup ALL PROMS ID 2",ethbID); 
+              console.log(" startup ALL PROMS ID =",ethbID.toString()); 
                 var xoff=50;
                 var yoff=50;
                 var p=0;
@@ -424,25 +424,28 @@ class App extends Component {
               ethb.id=ethbID;
               ethb.owner=owner;
               ethb.pallet=data[1];
-              // console.log("PALLET ",ethb.pallet)
+              console.log("SETTING STAT id",ethb.id)
               this.setState({
                 etherbrights: [...this.state.etherbrights, ethb]
               })
               // console.log("prom data ",data);
               // console.log("supply ",this.state.totalSupply);
 
-              console.log("promis resolved  ", i)
+              // console.log("promis resolved  ", returntotalSupply, " l=",this.state.etherbrights.length)
+              if(this.state.etherbrights.length==returntotalSupply){
+                console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DONE LOADING")
                     this.setState({loading:false})
+                  }
 
             },ethbID)
 
 
       }
       console.log("END LOOP l=",this.state.etherbrights.length," i=",i)
-      while(this.state.etherbrights.length<i-1){
-  console.log("loading")
-}
-this.setState({loading:false});
+//       while(this.state.etherbrights.length<i-1){
+//   console.log("loading")
+// }
+// this.setState({loading:false});
       // this.setState({SVGmap:_svgmap})
       // console.log("allsvgs",this.state.allSVGs)
       // console.log("MAP", this.state.svgmap)
@@ -640,7 +643,6 @@ render() {
 
             <div>
 
-              // {this.state.etherbrights.map(ethb => (console.log("LEN ",this.state.etherbrights.length)))}
 
               {this.state.etherbrights.map(ethb => (
                 <div >
