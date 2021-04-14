@@ -70,13 +70,14 @@ class App extends Component {
     this.state={
       account:'',
       contract: null,
-      contractSocket:null,
+      contractSocket: null,
       totalSupply: 1,
       svg:'', 
       colors: [],
       etherbrights: [],
       etherbrightIDs: [],
       allSVGs: [],
+      loading:true,
 
     }
 
@@ -137,18 +138,22 @@ class App extends Component {
       console.log("abi:",abi);
 
       // const returnContract = new web3.eth.Contract(abi, address)//creates a new version of this contract
-      const returnContract = new web3.eth.Contract(abi,"0xD60F684458C8994570f9bF9FEa60F86e21317D11")
+      const returnContract = new web3.eth.Contract(abi,"0x7A89254C63Fb2EE15DCa82F347066e850D263cAA")
       this.setState({ contract:returnContract })//sets it in state obj
       console.log("contract:",this.state.contract)
-      const returnContractSocket = new web3Socket.eth.Contract(abi,"0xD60F684458C8994570f9bF9FEa60F86e21317D11")
+      const returnContractSocket = new web3Socket.eth.Contract(abi,"0x7A89254C63Fb2EE15DCa82F347066e850D263cAA")
+      this.setState({contractSocket:returnContractSocket})
+            // console.log("contractScoket:",this.state.contract)
+
       // console.log("calling test return")
       // const testreturn=returnContract.methods.testReturn("this is a test").call({from: this.state.account})
       // console.log("testreturn ",testreturn)
       console.log("calling totalssupply")
       const returntotalSupply = await returnContract.methods.totalSupply().call()//calls a contracts method
       console.log("returntotalsupply",returntotalSupply.toString())
-      console.log("state total supply",this.state.totalSupply)
       this.setState({ totalSupply:returntotalSupply }) //sets state var
+      console.log("state total supply",this.state.totalSupply)
+
       // var returnSVG = await returnContract.methods.generateSVG().call()
       // this.setState({svg:returnSVG})
       // const tmp="<svg><circle cx="50" cy="50" r="20" fill="#ff0000" stroke-width="9" stroke="black"/></svg>"
@@ -183,23 +188,24 @@ class App extends Component {
           //   .then(function(result){console.log(result)})
 
         for (var index = 0; index < this.state.etherbrights.length; index++) {
-          console.log("index ",index);
-          console.log("state ID ",this.state.etherbrights[index].id.toHexString());
-          console.log("token id ",event.returnValues[0].toHexString());
-
+            console.log("index ",index);
+            console.log("state ID ",this.state.etherbrights[index].id.toHexString());
+            console.log("token id ",event.returnValues[0].toHexString());
           if (this.state.etherbrights[index].id.toHexString() === event.returnValues[0].toHexString()) {
             console.log("THIS IS IT")
+
             break;
           }
         }
+        console.log("etherbrights: ",this.state.etherbrights );
 
         var _etherbrights = Object.assign(this.state.etherbrights);
+                console.log("_etherbrights ",_etherbrights );
+
         var tmp;
         var pixN=event.returnValues[1];
-        // _etherbrights[index].svg=event.returnValues[1]
         _etherbrights[index].pixels[pixN].color=event.returnValues[3];
 
-        console.log("tmp result ",tmp );
         this.setState({etherbrights  :[] });
           this.setState({etherbrights:_etherbrights });
 
@@ -260,8 +266,8 @@ class App extends Component {
           var pixelColors=[];
           // returnContract.methods.getEtherbrightPallet(id).call().then(function(result){ethb.pallet=result;console.log("PALLET ",result)});
           // returnContract.methods.getEtherbrightPixels(id).call().then(function(result){pixelColors=result;console.log("PALLET ",result)});
-          proms.push(returnContract.methods.getEtherbrightPallet(id).call());
-          proms.push(returnContract.methods.getEtherbrightPixels(id).call());
+          proms.push(returnContractSocket.methods.getEtherbrightPallet(id).call());
+          proms.push(returnContractSocket.methods.getEtherbrightPixels(id).call());
           var allProms=Promise.all(proms);
             allProms.then((data) => {
               console.log("DATA 0",data[0])
@@ -382,12 +388,12 @@ class App extends Component {
       // }
       // var _svgmap = new Map();
       for (var i = 1; i <= returntotalSupply; i++) {
-      var ethb=new Etherbright();
-
+        var ethb=new Etherbright();
         var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
         var owner =await returnContract.methods.ownerOf(ethbID).call();
         ethb.id=ethbID;
         ethb.owner=owner;
+        console.log(" i=",i," id=",ethb.id)
         var proms=[];
         var pixels=[];
               // console.log(" startup ALL PROMS ID 1",ethb.id); 
@@ -416,7 +422,8 @@ class App extends Component {
               ethb.svg=generateSvg(ethb.id,ethb.pixels);
               ethb.id=ethbID;
               ethb.owner=owner;
-ethb.pallet=data[1];
+              ethb.pallet=data[1];
+              // console.log("PALLET ",ethb.pallet)
               this.setState({
                 etherbrights: [...this.state.etherbrights, ethb]
               })
@@ -428,6 +435,7 @@ ethb.pallet=data[1];
 
 
       }
+      this.setState({loading:false})
       // this.setState({SVGmap:_svgmap})
       // console.log("allsvgs",this.state.allSVGs)
       // console.log("MAP", this.state.svgmap)
@@ -491,19 +499,20 @@ mint = (color) => {
 mintEtherbright = ()=>{
   console.log("MINTETHERBRIGHT account: ",this.state.account)
   this.state.contract.methods.mintEtherbright(this.state.account)
-  .send({from: this.state.account ,gas:3000000})
+  .send({from: this.state.account })
 }
 
 
 setPixelColor = (n, color) =>{
   this.state.contract.methods.setPixel(n, color)
-  .send({from: this.state.account, gas:3000000})
+  .send({from: this.state.account})
 
 }
 
 setEtherbrightPixelColor = (id, pixn, paln) => {
+  console.log("setEtherbrightPixelColor: ",id," ",pixn," ",paln)
   this.state.contract.methods.setEtherbrightPixel(id, pixn, paln)
-  .send({from: this.state.account, gas:3000000})
+  .send({from: this.state.account})
 }
 
 testsvgonclick=(e,id)=>{
@@ -545,6 +554,9 @@ console.log(this.state.etherbrights)}
 
 
 render() {
+  if(this.state.loading){
+     return (<div>LOADING</div>)
+  }
   return (
     <div>
       <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
@@ -621,7 +633,7 @@ render() {
 
           <div>
 
-
+{this.state.etherbrights.map(ethb => (console.log("PREID",ethb.id)))}
 
             {this.state.etherbrights.map(ethb => (
               <div id="parent">
@@ -661,6 +673,7 @@ class EthbDisplay extends Component{
       owner: props.owner,
       pallet: props.pallet,
     };
+    console.log("ETHBDISP ID",props)
   }
   componentWillReceiveProps(newProps){
       this.setState({
