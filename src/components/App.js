@@ -55,7 +55,7 @@ function generateSvg(id, pixels){
         p++;
       } 
     }
-  header=header.concat("</svg>");
+  header=header.concat(footer);
   return header;
 // console.log("generateSVG  ",header)
 
@@ -202,7 +202,7 @@ class App extends Component {
         var _etherbrights = Object.assign(this.state.etherbrights);
                 console.log("_etherbrights ",_etherbrights );
 
-        var tmp;
+        // var tmp;
         var pixN=event.returnValues[1];
         _etherbrights[index].pixels[pixN].color=event.returnValues[3];
 
@@ -256,14 +256,14 @@ class App extends Component {
           var owner=event.returnValues[1];
           console.log(" minted id ",id)
 
-          var pixels=[];
-          var svg="tmp";
-          var waiting=1;
+          // var pixels=[];
+          // var svg="tmp";
+          // var waiting=1;
           var ethb=new Etherbright(); 
           ethb.id=id;
           ethb.owner=owner;
           var proms=[];
-          var pixelColors=[];
+          // var pixelColors=[];
           // returnContract.methods.getEtherbrightPallet(id).call().then(function(result){ethb.pallet=result;console.log("PALLET ",result)});
           // returnContract.methods.getEtherbrightPixels(id).call().then(function(result){pixelColors=result;console.log("PALLET ",result)});
           proms.push(returnContractSocket.methods.getEtherbrightPallet(id).call());
@@ -388,14 +388,13 @@ class App extends Component {
       // }
       // var _svgmap = new Map();
       for (var i = 1; i <= returntotalSupply; i++) {
-        var ethb=new Etherbright();
         var ethbID = await returnContract.methods.tokenByIndex(i - 1).call()
         var owner =await returnContract.methods.ownerOf(ethbID).call();
-        ethb.id=ethbID;
-        ethb.owner=owner;
-        console.log(" i=",i," id=",ethb.id)
+        // ethb.id=ethbID;
+        // ethb.owner=owner;
+        console.log(" i=",i," id=",ethbID.toString())
         var proms=[];
-        var pixels=[];
+        // var pixels=[];
               // console.log(" startup ALL PROMS ID 1",ethb.id); 
 
         // for(var p=0; p<24; p++){
@@ -417,6 +416,8 @@ class App extends Component {
                     p++;
                   }
                 }
+              const ethb=new Etherbright();
+
               ethb.pixels=pixels;
               // console.log("PIX ",ethb.pixels);
               ethb.svg=generateSvg(ethb.id,ethb.pixels);
@@ -430,12 +431,18 @@ class App extends Component {
               // console.log("prom data ",data);
               // console.log("supply ",this.state.totalSupply);
 
-              // console.log("generateSVG  ", ethb.svg)
+              console.log("promis resolved  ", i)
+                    this.setState({loading:false})
+
             },ethbID)
 
 
       }
-      this.setState({loading:false})
+      console.log("END LOOP l=",this.state.etherbrights.length," i=",i)
+      while(this.state.etherbrights.length<i-1){
+  console.log("loading")
+}
+this.setState({loading:false});
       // this.setState({SVGmap:_svgmap})
       // console.log("allsvgs",this.state.allSVGs)
       // console.log("MAP", this.state.svgmap)
@@ -556,110 +563,111 @@ console.log(this.state.etherbrights)}
 render() {
   if(this.state.loading){
      return (<div>LOADING</div>)
-  }
-  return (
-    <div>
-      <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a
-          className="navbar-brand col-sm-3 col-md-2 mr-0"
-          href="http://www.TheEverbright.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Etherbright
-        </a>
-        <ul className="navbar-nav px-3">
-          <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
-            <small className="text-white"><span id="account">{this.state.account}</span></small>
-          </li>
-        </ul>
-      </nav>
-      <div className="container-fluid mt-5">
-        <div className="row">
-          <main role="main" className="col-lg-12 d-flex text-center">
-            <div className="content mr-auto ml-auto">
-              <h1>setPixelColor</h1>
-              <form onSubmit={(event) => {
-                event.preventDefault()
-                const color = this.color.value
-                const n = this.n.value
-                this.setPixelColor(n,color)
-              }}>
-                <input
-                  type='text'
-                  className='form-control mb-1'
-                  placeholder='e.g. #FFFFFF'
-                  ref={(input) => { this.color = input }}
-                />
-                <input
-                  type='text'
-                  className='form-control mb-1'
-                  placeholder='pixel number'
-                  ref={(input) => { this.n = input }}
-                />
-                <input
-                  type='submit'
-                  className='btn btn-block btn-primary'
-                  value='SET PIXEL COLOR'
-                />
-              </form>
-            </div>
-          </main>
-        </div>
-          <hr/>
-          <button onClick={this.mintEtherbright}>mint etherbright</button>
-          <hr/>
-          <button onClick={this.getAllTokenId}>get all token ID</button>
-           <hr/>
-          <button onClick={this.update}>update</button>
-          {/*
-          <hr/>
-          <h1>JUNK</h1>
-          <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
-          <hr/>
-          <div dangerouslySetInnerHTML={{__html: this.state.allSVGs }} />
-          <h1>more 2JUNK</h1>
-            <svg width='100' height='100'>
-            <circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/>
-            </svg>
-          <hr/>
-        */}
-
-
-
-
-        <div className="row text-center">
-
-
-          <div>
-
-{this.state.etherbrights.map(ethb => (console.log("PREID",ethb.id)))}
-
-            {this.state.etherbrights.map(ethb => (
-              <div id="parent">
-              <hr/>
-                <EthbDisplay id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} pallet={ethb.pallet} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
+  }else{
+    return (
+      <div>
+        <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+          <a
+            className="navbar-brand col-sm-3 col-md-2 mr-0"
+            href="http://www.TheEverbright.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Etherbright
+          </a>
+          <ul className="navbar-nav px-3">
+            <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
+              <small className="text-white"><span id="account">{this.state.account}</span></small>
+            </li>
+          </ul>
+        </nav>
+        <div className="container-fluid mt-5">
+          <div className="row">
+            <main role="main" className="col-lg-12 d-flex text-center">
+              <div className="content mr-auto ml-auto">
+                <h1>setPixelColor</h1>
+                <form onSubmit={(event) => {
+                  event.preventDefault()
+                  const color = this.color.value
+                  const n = this.n.value
+                  this.setPixelColor(n,color)
+                }}>
+                  <input
+                    type='text'
+                    className='form-control mb-1'
+                    placeholder='e.g. #FFFFFF'
+                    ref={(input) => { this.color = input }}
+                  />
+                  <input
+                    type='text'
+                    className='form-control mb-1'
+                    placeholder='pixel number'
+                    ref={(input) => { this.n = input }}
+                  />
+                  <input
+                    type='submit'
+                    className='btn btn-block btn-primary'
+                    value='SET PIXEL COLOR'
+                  />
+                </form>
               </div>
-            ))}
-
+            </main>
           </div>
-
-
-        {/*  { this.state.colors.map(
-            (color, key) => {
-              return(
-                <div key={key} className="col-md-3 mb-3">
-                  <div className="token" style={{ backgroundColor: color }}></div>
-                  <div>{color}</div>
-                </div>
-              )
-            })
-          }
+            <hr/>
+            <button onClick={this.mintEtherbright}>mint etherbright</button>
+            <hr/>
+            <button onClick={this.getAllTokenId}>get all token ID</button>
+             <hr/>
+            <button onClick={this.update}>update</button>
+            {/*
+            <hr/>
+            <h1>JUNK</h1>
+            <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
+            <hr/>
+            <div dangerouslySetInnerHTML={{__html: this.state.allSVGs }} />
+            <h1>more 2JUNK</h1>
+              <svg width='100' height='100'>
+              <circle cx='50' cy='50' r='20' fill='#ffff00' strokeWidth='9' stroke='black'/>
+              </svg>
+            <hr/>
           */}
+
+
+
+
+          <div className="row text-center">
+
+
+            <div>
+
+              // {this.state.etherbrights.map(ethb => (console.log("LEN ",this.state.etherbrights.length)))}
+
+              {this.state.etherbrights.map(ethb => (
+                <div >
+                <hr/>
+                  <EthbDisplay key={ethb.id} id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} pallet={ethb.pallet} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
+                </div>
+              ))}
+
+            </div>
+
+
+          {/*  { this.state.colors.map(
+              (color, key) => {
+                return(
+                  <div key={key} className="col-md-3 mb-3">
+                    <div className="token" style={{ backgroundColor: color }}></div>
+                    <div>{color}</div>
+                  </div>
+                )
+              })
+            }
+            */}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
  }
 }
 
@@ -690,7 +698,7 @@ class EthbDisplay extends Component{
 
   getCircle(n,x,y,c){
     return(
-            <circle id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
+            <circle key={n} id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
       )
   }
   render(){
@@ -715,7 +723,7 @@ class EthbDisplay extends Component{
                 event.preventDefault()
                 const paln = this.paln.value
                 const pixn = this.pixn.value
-                const id = this.state.id
+                // const id = this.state.id
                 this.props.setmethod(this.state.id,pixn,paln)
               }}>
                 <input
