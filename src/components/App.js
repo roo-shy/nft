@@ -60,7 +60,7 @@ function generateSvg(id, pixels){
 // console.log("generateSVG  ",header)
 
 }
-  
+
 
 class App extends Component {
 
@@ -95,6 +95,10 @@ class App extends Component {
       window.web3=new Web3(window.ethereum)//was mm
 
       await window.ethereum.enable()
+
+
+
+
     }
     else if (window.web3) {
                   console.log("loadWeb3  WEB3");
@@ -123,8 +127,15 @@ class App extends Component {
     const web3Socket = window.web3Socket
     // Load account
     const accounts = await web3.eth.getAccounts() //gets accout from metamask
-        // const accounts = await window.mm.eth.getAccounts() //gets accout from metamask
 
+        // const accounts = await window.mm.eth.getAccounts() //gets accout from metamask
+      window.ethereum.on('accountsChanged',  (accounts) =>{
+  // Time to reload your interface with accounts[0]!
+   // this.setState({ account: accounts[0] })
+   console.log(accounts)
+       this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
+
+})
     console.log("account: ",accounts)
     this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
     const networkId = await web3.eth.net.getId() //detercts the eth network 
@@ -389,7 +400,7 @@ class App extends Component {
       // var _svgmap = new Map();
       for (var i = 0; i < returntotalSupply; i++) {
         var ethbID = await returnContract.methods.tokenByIndex(i).call()
-        var owner =await returnContract.methods.ownerOf(ethbID).call();
+        // var owner =await returnContract.methods.ownerOf(ethbID).call();
         // ethb.id=ethbID;
         // ethb.owner=owner;
         console.log(" i=",i," id=",ethbID.toString())
@@ -402,6 +413,8 @@ class App extends Component {
         // }
         proms.push(returnContract.methods.getEtherbrightPixels(ethbID).call());
         proms.push(returnContract.methods.getEtherbrightPallet(ethbID).call());
+        proms.push(returnContract.methods.tokenByIndex(i).call());
+        proms.push(returnContract.methods.ownerOf(ethbID).call());
         var allProms=Promise.all(proms);
             allProms.then((data) => {
 
@@ -421,14 +434,15 @@ class App extends Component {
               ethb.pixels=pixels;
               // console.log("PIX ",ethb.pixels);
               ethb.svg=generateSvg(ethb.id,ethb.pixels);
-              ethb.id=ethbID;
-              ethb.owner=owner;
+             
               ethb.pallet=data[1];
+              ethb.id=data[2];
+              ethb.owner=data[3];
               console.log("SETTING STAT id",ethb.id)
               this.setState({
                 etherbrights: [...this.state.etherbrights, ethb]
               })
-              // console.log("prom data ",data);
+              console.log("prom data ",data);
               // console.log("supply ",this.state.totalSupply);
 
               // console.log("promis resolved  ", returntotalSupply, " l=",this.state.etherbrights.length)
