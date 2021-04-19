@@ -22,16 +22,18 @@ contract Color is ERC721, Ownable {
 		string[] pallet;
 		string[] mintPixels;
 		uint256 seed;
+		bool publicPixels;
+		bool publicClearCanvas;
 	}
 	
 	
-	event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
+	// event PixelChanged(uint indexed changedPixel, string from, string to, address indexed by);
 	event ClearCanvas(address indexed by);
 	event ResetCanvas(address indexed by);
 	// event SVGgenerated(string SVG, address indexed by);
 	// event EtherbrightMinted(uint256 tokenId, string svg, address mintedBy, uint256 nEtherbrights);
-	event EtherbrightMinted(uint256 tokenId, address mintedBy, uint256 nEtherbrights);
-	event EtherbrightPixelChanged(uint256 tokenId, uint pn, string from, string to, address indexed by);
+	event EtherbrightMinted(uint256 indexed tokenId, address indexed mintedBy, uint256 nEtherbrights);
+	event EtherbrightPixelChanged(uint256 indexed tokenId, uint pn, string from, string to, address indexed by);
 	// event EtherbrightSVGgenerated(uint _tokenId, string svg, address indexed by);
 	event Selector(uint8 selector);
 	
@@ -152,7 +154,6 @@ contract Color is ERC721, Ownable {
   			allEtherbrights[tokenId].pallet.push("#ff0000");
 			allEtherbrights[tokenId].pallet.push("#ff7700");
 			allEtherbrights[tokenId].pallet.push("#ffdd00");
-
 						allEtherbrights[tokenId].pallet.push("#eaff00");
   			allEtherbrights[tokenId].pallet.push("#a2ff00");
 			allEtherbrights[tokenId].pallet.push("#26ff00");
@@ -180,7 +181,6 @@ contract Color is ERC721, Ownable {
   			allEtherbrights[tokenId].pallet.push("#75ff7a");
 			allEtherbrights[tokenId].pallet.push("#acff75");
 			allEtherbrights[tokenId].pallet.push("#e8ff75");
-
 									allEtherbrights[tokenId].pallet.push("#fff175");
   			allEtherbrights[tokenId].pallet.push("#ffd375");
 			allEtherbrights[tokenId].pallet.push("#00ff00");
@@ -250,12 +250,13 @@ contract Color is ERC721, Ownable {
 	 	return allEtherbrights[_tokenId].pallet;
 	 	
 	 }
-		 function getEtherbrightPixels(uint256 _tokenId) public returns(string[] memory)  {
+	function getEtherbrightPixels(uint256 _tokenId) public returns(string[] memory)  {
 	 	return allEtherbrights[_tokenId].setPixels;
-	 	
-	 } 
+	} 
 
-
+	function getEtherbrightMintPixels(uint256 _tokenId) public returns(string[] memory)  {
+	 	return allEtherbrights[_tokenId].mintPixels;
+	} 
   	// function generateEtherbrightsSVG(uint256 _tokenId) public returns (string memory){
   	// 	//returns the svg string of the canvas
   	// 	    string memory ethbsvg = 

@@ -6,8 +6,12 @@ import Web3 from 'web3';
 import Color from '../abis/Color.json'
 import { CirclePicker } from 'react-color';
 
+const contractAddy="0xFaFb7b0B15B240c42D011D2b9779804A847FdF58";
 
-function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner ){
+var history=[];
+var gotPastEvents=false;
+
+function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner, history ){
   this.id=id;
   this.owner=owner;
   this.svg=svg;
@@ -16,6 +20,7 @@ function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner ){
   this.pallet=pallet;
   this.xpos=xpos;
   this.ypos=ypos;
+  this.history=history;
 
 }
 function Pixel(id,xpos,ypos,color){
@@ -33,6 +38,21 @@ function Pixel(id,xpos,ypos,color){
 //   window.App.setEtherbrightPixelColor(e.target.getAttributeNS(null,"id"),0,0);
 
 // };
+
+// function getHistory(id){
+//   // console.log(" GETTING HISTORY for : ",id)
+//   // console.log()
+//   var pixHist=[];
+//   for (const hist of history) {
+//       // console.log("hist ",hist.returnValues[0]);
+
+//     if(hist.returnValues[0].toString()==id.toString()){
+//     // console.log("MATCH",hist.returnValues[0]);
+//       pixHist.push([hist.returnValues[1].toNumber(),hist.returnValues[2]])
+//     }
+//   }
+//   return pixHist;
+// }
 
 function generateSvg(id, pixels){
   var header="<svg width='300' height='300'>";
@@ -129,13 +149,10 @@ class App extends Component {
     const accounts = await web3.eth.getAccounts() //gets accout from metamask
 
         // const accounts = await window.mm.eth.getAccounts() //gets accout from metamask
-      window.ethereum.on('accountsChanged',  (accounts) =>{
-  // Time to reload your interface with accounts[0]!
-   // this.setState({ account: accounts[0] })
-   console.log(accounts)
-       this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
-
-})
+    window.ethereum.on('accountsChanged',  (accounts) =>{
+      console.log("ACCOUNT CHANGE")
+      this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
+      })
     console.log("account: ",accounts)
     this.setState({ account: accounts[0] })//state store property values of a componet and when the state chages the componet re-renders
     const networkId = await web3.eth.net.getId() //detercts the eth network 
@@ -149,10 +166,10 @@ class App extends Component {
       console.log("abi:",abi);
 
       // const returnContract = new web3.eth.Contract(abi, address)//creates a new version of this contract
-      const returnContract = new web3.eth.Contract(abi,"0x7A89254C63Fb2EE15DCa82F347066e850D263cAA")
+      const returnContract = new web3.eth.Contract(abi,contractAddy)
       this.setState({ contract:returnContract })//sets it in state obj
       console.log("contract:",this.state.contract)
-      const returnContractSocket = new web3Socket.eth.Contract(abi,"0x7A89254C63Fb2EE15DCa82F347066e850D263cAA")
+      const returnContractSocket = new web3Socket.eth.Contract(abi,contractAddy)
       this.setState({contractSocket:returnContractSocket})
             // console.log("contractScoket:",this.state.contract)
 
@@ -366,13 +383,17 @@ class App extends Component {
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
       .on('error',console.error);
 
-      // returnContract.getPastEvents('PixelChanged', {
-      //     fromBlock: 0,
-      //     toBlock: 'latest'
-      // }, function(error, events){ console.log(events); })
-      // .then(function(events){
-      //     console.log(events) // same results as the optional callback above
-      // });
+      returnContractSocket.getPastEvents('EtherbrightPixelChanged', {fromBlock: 0,toBlock: 'latest'},
+      (error, events)=>{ console.log(" PAST EVENTS  !!!!!" ,events); history=events; console.log("H=",history); gotPastEvents=true; })
+      .then((events)=>{
+        // history=events;
+        // for (const e of events){
+          // console.log("E= ",events)
+        // }
+
+
+          // console.log(events) // same results as the optional callback above
+      });
 
 
       // returnContract.getPastEvents('SVGgenerated', {
@@ -398,64 +419,66 @@ class App extends Component {
       //   })
       // }
       // var _svgmap = new Map();
-      for (var i = 0; i < returntotalSupply; i++) {
-        var ethbID = await returnContract.methods.tokenByIndex(i).call()
-        // var owner =await returnContract.methods.ownerOf(ethbID).call();
-        // ethb.id=ethbID;
-        // ethb.owner=owner;
-        console.log(" i=",i," id=",ethbID.toString())
-        var proms=[];
-        // var pixels=[];
-              // console.log(" startup ALL PROMS ID 1",ethb.id); 
+      if(returntotalSupply>0){
+          for (var i = 0; i < returntotalSupply; i++) {
+            var ethbID = await returnContract.methods.tokenByIndex(i).call()
+            var proms=[];
+            proms.push(returnContract.methods.getEtherbrightPixels(ethbID).call());
+            proms.push(returnContract.methods.getEtherbrightPallet(ethbID).call());
+            proms.push(returnContract.methods.tokenByIndex(i).call());
+            proms.push(returnContract.methods.ownerOf(ethbID).call());
+            // console.log("ID ",ethbID._hex)
+            proms.push(returnContractSocket.getPastEvents('EtherbrightPixelChanged', {fromBlock: 0,toBlock: 'latest',topics: [ethbID._hex]}))
+            var allProms=Promise.all(proms);
+                allProms.then((data) => {
 
-        // for(var p=0; p<24; p++){
-        //   proms.push(returnContract.methods.getEtherbrightPixelColor(ethb.id,p).call())
-        // }
-        proms.push(returnContract.methods.getEtherbrightPixels(ethbID).call());
-        proms.push(returnContract.methods.getEtherbrightPallet(ethbID).call());
-        proms.push(returnContract.methods.tokenByIndex(i).call());
-        proms.push(returnContract.methods.ownerOf(ethbID).call());
-        var allProms=Promise.all(proms);
-            allProms.then((data) => {
+                  // console.log(" startup ALL PROMS ID =",ethbID.toString()); 
+                    var xoff=50;
+                    var yoff=50;
+                    var p=0;
+                    var pixels=[];
+                    for(var x=1; x<=5; x++){
+                      for(var y=1; y<=5; y++){
+                        pixels.push(new Pixel(p,xoff*x,yoff*y,data[0][p]))
+                        p++;
+                      }
+                    }
+                  const ethb=new Etherbright();
 
-              console.log(" startup ALL PROMS ID =",ethbID.toString()); 
-                var xoff=50;
-                var yoff=50;
-                var p=0;
-                var pixels=[];
-                for(var x=1; x<=5; x++){
-                  for(var y=1; y<=5; y++){
-                    pixels.push(new Pixel(p,xoff*x,yoff*y,data[0][p]))
-                    p++;
+                  ethb.pixels=pixels;
+                  // console.log("PIX ",ethb.pixels);
+                  ethb.svg=generateSvg(ethb.id,ethb.pixels);
+                 
+                  ethb.pallet=data[1];
+                  ethb.id=data[2];
+                  ethb.owner=data[3];
+                  // console.log("HISTORY PROM ",data[4])
+                  // ethb.history=getHistory(ethb.id);
+                  var pixHist=[];
+                  for(var hist of data[4]){
+                    pixHist.push([hist.returnValues[1].toNumber(),hist.returnValues[2]])
                   }
-                }
-              const ethb=new Etherbright();
+                  ethb.history=pixHist
+                  console.log("SETTING ETHB HISTORY ",ethb.history)
+                  this.setState({
+                    etherbrights: [...this.state.etherbrights, ethb]
+                  })
+                  console.log("prom data ",data);
+                  // console.log("supply ",this.state.totalSupply);
 
-              ethb.pixels=pixels;
-              // console.log("PIX ",ethb.pixels);
-              ethb.svg=generateSvg(ethb.id,ethb.pixels);
-             
-              ethb.pallet=data[1];
-              ethb.id=data[2];
-              ethb.owner=data[3];
-              console.log("SETTING STAT id",ethb.id)
-              this.setState({
-                etherbrights: [...this.state.etherbrights, ethb]
-              })
-              console.log("prom data ",data);
-              // console.log("supply ",this.state.totalSupply);
+                  // console.log("promis resolved  ", returntotalSupply, " l=",this.state.etherbrights.length)
+                  if(this.state.etherbrights.length==returntotalSupply ){
+                 
+                    console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DONE LOADING")
+                        this.setState({loading:false})
+                      }
 
-              // console.log("promis resolved  ", returntotalSupply, " l=",this.state.etherbrights.length)
-              if(this.state.etherbrights.length==returntotalSupply){
-                console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DONE LOADING")
-                    this.setState({loading:false})
-                  }
-
-            },ethbID)
-
-
+                },ethbID)
+          }
+      }else{
+        this.setState({loading:false})
+        // console.log("END LOOP l=",this.state.etherbrights.length," i=",i)
       }
-      console.log("END LOOP l=",this.state.etherbrights.length," i=",i)
 //       while(this.state.etherbrights.length<i-1){
 //   console.log("loading")
 // }
