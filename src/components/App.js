@@ -1,15 +1,20 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 // import { ReactSVG } from 'react-svg'
 // import logo from '../logo.png';
 import './App.css';
 import Web3 from 'web3';
 import Color from '../abis/Color.json'
 import { CirclePicker } from 'react-color';
+import EtherbrightPixelDisplay from "./EtherbrightPixelDisplay"
 
+import { Animate } from 'react-move'
+import * as d3 from 'd3'
 const contractAddy="0xFaFb7b0B15B240c42D011D2b9779804A847FdF58";
 
 var history=[];
 var gotPastEvents=false;
+var tickTiming = { duration: 800, ease: d3.easeElasticOut.amplitude(1.5).period(1.5) };
+
 
 function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner, history, mintPix){
   this.id=id;
@@ -82,6 +87,19 @@ function generateSvg(id, pixels){
 
 }
 
+// function useTick(delay, initialIndex) {
+//   const [tick, setTick] = useState(initialIndex ? initialIndex : 0);
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       if (!document.hidden) {
+//         setTick((tick) => tick + 1);
+//       }
+//     }, delay);
+//     return () => clearInterval(interval);
+//   }, []);
+//   return tick;
+// }
+
 
 class App extends Component {
 
@@ -99,9 +117,7 @@ class App extends Component {
       etherbrightIDs: [],
       allSVGs: [],
       loading:true,
-
     }
-
   }
 
   async loadWeb3() {
@@ -229,55 +245,15 @@ class App extends Component {
         // console.log("etherbrights: ",this.state.etherbrights );
 
         var _etherbrights = Object.assign(this.state.etherbrights);
-                // console.log("_etherbrights ",_etherbrights );
-
-        // var tmp;
         var pixN=event.returnValues[1];
         _etherbrights[index].pixels[pixN].color=event.returnValues[3];
 
         this.setState({etherbrights  :[] });
           this.setState({etherbrights:_etherbrights });
-
-              // this.setMethod(_etherbrights);
-
-
-
-        // this.state.etherbrights.map(ethb =>{
-        //   if(ethb.id=event.returnValues[0]){
-
-        //     // console.log("THIS IS IT", index);
-        //     var returnSVG =  returnContract.methods.generateEtherbrightsSVG(event.returnValues[0]).call()
-        //     // this.setState()
-        //     // let tmparray=this.state.etherbrights.slice();
-        //     // tmparray[id][svg]=returnSVG;
-        //     // setarray(tmparray);
-
-        //   }
-
-        //   }
-        //   )
-
       })
       .on('error', console.error)
 
-      // returnContract.events.PixelChanged()
-      // .on('data', (event) => {
-      //   console.log("PIXEL CHANGED EVENT ",event.returnValues[0]);
 
-      // })
-      // .on('error', console.error)
-
-
-
-      // returnContract.events.EtherbrightMinted()
-      // .on('data', (event) => {
-      //   console.log("Etherbright Minted ",event);
-      //     var ethb=new Etherbright(event.returnValues[0],event.returnValues[1]);
-      //   this.setState({
-      //     etherbrights: [...this.state.etherbrights, ethb]
-      //   })
-      // })
-      // .on('error', console.error)
       returnContractSocket.events.EtherbrightMinted()
       .on('data', (event) => {
         console.log("Etherbright Minted ",event);
@@ -327,9 +303,6 @@ class App extends Component {
       })
       .on('error', console.error)
 
-
-
-
       returnContractSocket.events.Transfer()
       .on('data', (event) =>{console.log("GOT EVENT");console.log(event);})
       .on('error',console.error);
@@ -339,30 +312,6 @@ class App extends Component {
       .then((events)=>{
       });
 
-
-      // returnContract.getPastEvents('SVGgenerated', {
-      //     fromBlock: 0,
-      //     toBlock: 'latest'
-      // }, function(error, events){ 
-      //     console.log(events); 
-      //     // returnSVG= returnContract.methods.generateSVG().call();
-      //     // this.setState({svg:returnSVG});
-
-      //    })
-      // .then(function(events){
-      //     console.log(events) // same results as the optional callback above
-      // });
-
-
-
-      // Load Colors
-      // for (var i = 1; i <= returntotalSupply; i++) {
-      //   const color = await returnContract.methods.colors(i - 1).call()
-      //   this.setState({
-      //     colors: [...this.state.colors, color]
-      //   })
-      // }
-      // var _svgmap = new Map();
       if(returntotalSupply>0){
           for (var i = 0; i < returntotalSupply; i++) {
             var ethbID = await returnContract.methods.tokenByIndex(i).call()
@@ -424,45 +373,12 @@ class App extends Component {
         this.setState({loading:false})
         // console.log("END LOOP l=",this.state.etherbrights.length," i=",i)
       }
-//       while(this.state.etherbrights.length<i-1){
-//   console.log("loading")
-// }
-// this.setState({loading:false});
-      // this.setState({SVGmap:_svgmap})
-      // console.log("allsvgs",this.state.allSVGs)
-      // console.log("MAP", this.state.svgmap)
     } else {
       window.alert('Smart contract not deployed to detected network.')
     }
-  }
+}
 
 
-
-  //javascript arrow function =>
-  // () define the list of pramaters followed by "fat arrow" => and {} that delimit the functions body
-  // ... is spread syntax which expands an iterable like an array or string 
-  //
-  // this callwebs the mint method in the contract with seend passing the accout
-  // .once is a promiss event that watches for events like'receipt' and then can call a function with it
-  // when we get a receipt event we call setstate and add the color we justed mined to the list
-  
-// //#dc34eb
-//   mint = (color) => {
-//     this.state.contract.methods
-//         // this.state.contract
-
-//     .mint(color)
-//     .send({ from: this.state.account })
-//     .once('receipt',
-//        (receipt) => {
-//           this.setState(
-//             {
-//             colors: [...this.state.colors, color]
-//             }
-//           )
-//         }
-//     )
-//   }
 
 mint = (color) => {
   this.state.contract.methods.mint(color)
@@ -485,8 +401,7 @@ mint = (color) => {
 
   this.setState({etherbrights  :[] });
   this.setState({etherbrights:_etherbrights });
-  // this.setState(this.state);
-  // console.log("SET METHOD");
+
 }
 mintEtherbright = ()=>{
   console.log("MINTETHERBRIGHT account: ",this.state.account)
@@ -515,10 +430,6 @@ testsvgonclick=(e,id)=>{
 
 }
 getAllTokenId = ()=>{
-  // var nTokens=this.state.contract.methods.totalSupply().call();
-  // for (var i = 0; i <nTokens; i++) {
-  //   console.log("getalldis ",i)
-  // }
   this.state.contract.methods.totalSupply().call()
   .then(
       function(totalSupply){
@@ -529,21 +440,6 @@ getAllTokenId = ()=>{
 
 update=()=>{this.forceUpdate();
 console.log(this.state.etherbrights)}
-  // mint = (color) => {
-  //   this.state.contract.mint(color)
-  //   .call({from: this.state.account})
-  //   .once('receipt',
-  //      (receipt) => {
-  //         this.setState(
-  //           {
-  //           colors: [...this.state.colors, color]
-  //           }
-  //         )
-  //       }
-  //   )
-  // }
-
-
 
 render() {
   if(this.state.loading){
@@ -616,37 +512,15 @@ render() {
               </svg>
             <hr/>
           */}
-
-
-
-
           <div className="row text-center">
-
-
             <div>
-
-
               {this.state.etherbrights.map(ethb => (
                 <div >
                 <hr/>
                   <EthbDisplay key={ethb.id} id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} pallet={ethb.pallet} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
                 </div>
               ))}
-
             </div>
-
-
-          {/*  { this.state.colors.map(
-              (color, key) => {
-                return(
-                  <div key={key} className="col-md-3 mb-3">
-                    <div className="token" style={{ backgroundColor: color }}></div>
-                    <div>{color}</div>
-                  </div>
-                )
-              })
-            }
-            */}
           </div>
         </div>
       </div>
@@ -671,63 +545,69 @@ class EthbDisplay extends Component{
       this.setState({
           location: newProps.location
       })
+
   }
   getAllColors(){
     // console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ",this.state.pallet);
     return(
       this.state.pallet
       )
-    
   }
 
   getCircle(n,x,y,c){
+
     return(
-            <circle key={n} id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
-      )
+      <circle key={n} id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' onClick  ={(e) => {this.props.testsvg(e);}}/>
+    )
   }
+
+
   render(){
+
     return(
       <div >
-            <svg width='300' height='300'>
-            {this.state.pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
-            </svg>
-                      <div align="left">
-            <h5>Etherbright id:</h5> <h6> {this.state.id.toHexString()}</h6>
-            <br/>
-            <h5>Etherbright owner:</h5> {this.state.owner}
-            </div>  
-              <CirclePicker colors={this.getAllColors()}/>
-              <h3>setPixelColor</h3>
-              <form onSubmit={(event) => {
-                event.preventDefault()
-                const paln = this.paln.value
-                const pixn = this.pixn.value
-                // const id = this.state.id
-                this.props.setmethod(this.state.id,pixn,paln)
-              }}>
-                <input
-                  type='text'
-                  className='form-control mb-1'
-                  placeholder='pixel number'
-                  ref={(input) => { this.pixn = input }}
-                />
-                <input
-                  type='text'
-                  className='form-control mb-1'
-                  placeholder='pallent n'
-                  ref={(input) => { this.paln = input }}
-                />
-                <input
-                  type='submit'
-                  className='btn btn-block btn-primary'
-                  value='SET PIXEL COLOR'
-                />
-              </form>
-      <button className="button" onClick={() => alert(this.state.id)}>
-      </button>
-          <hr/>
-          </div>
-      );
-    }
+        <svg width='300' height='300'>
+          {this.state.pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
+        </svg>
+        <div align="left">
+          <EtherbrightPixelDisplay pallet={this.getAllColors()} id={this.state.id} pixels={this.state.pixels} />
+
+          <h5>Etherbright id:</h5> <h6> {this.state.id.toHexString()}</h6>
+          <br/>
+          <h5>Etherbright owner:</h5> {this.state.owner}
+        </div>  
+        <CirclePicker colors={this.getAllColors()}/>
+        <h3>setPixelColor</h3>
+        <form onSubmit={(event) => {
+          event.preventDefault()
+          const paln = this.paln.value
+          const pixn = this.pixn.value
+          // const id = this.state.id
+          this.props.setmethod(this.state.id,pixn,paln)
+        }}>
+          <input
+            type='text'
+            className='form-control mb-1'
+            placeholder='pixel number'
+            ref={(input) => { this.pixn = input }}
+          />
+          <input
+            type='text'
+            className='form-control mb-1'
+            placeholder='pallent n'
+            ref={(input) => { this.paln = input }}
+          />
+          <input
+            type='submit'
+            className='btn btn-block btn-primary'
+            value='SET PIXEL COLOR'
+          />
+        </form>
+        <button className="button" onClick={() => alert(this.state.id)}>
+        </button>
+        <hr/>
+      </div>
+    );
+  }
 }
 export default App;
