@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Animate } from 'react-move';
-import { SvgLoader, SvgProxy } from 'react-svgmt';
+// import { SvgLoader, SvgProxy } from 'react-svgmt';
+import { interpolate, interpolateTransformSvg } from 'd3-interpolate'
 
 export default class EtherbrightPixelDisplay extends Component{
 	constructor(props){
@@ -18,7 +19,7 @@ export default class EtherbrightPixelDisplay extends Component{
     //Use React Move to animate the body
 	    setInterval(() => {
 	      this.setState(this.changecolor);
-	    }, 2000);
+	    }, 1000);
 	}
 	changecolor(prevState){
 		// console.log("JUMP ",this.state.c1);
@@ -50,11 +51,20 @@ export default class EtherbrightPixelDisplay extends Component{
 	 	return(
 	        <svg width="300" height="300">
 	          <Animate
-	            start={{ c: "#ff00ff" }}
+	            start={{ c: this.state.c1 }}
 	            enter={{ c: this.state.c1 }}
 	            update={{ c: this.state.c1 }}
-	                        duration={0}
-            // easing="easePolyIn"
+	     //        interpolation ={(begValue, endValue, attr) => { // pass as prop
+				  //   if (attr === 'transform') {
+				  //     return interpolateTransformSvg(begValue, endValue)
+				  //   }
+
+				  //   return interpolate(begValue, endValue)
+				  // }}
+				   // timing={ { duration: 0, delay: 0 }}
+	            duration={0}
+	            delay={0}
+            easing="expOut"
 	          >
 	            {(data) => {
 	            	{/*console.log("DATA ",data.c);*/}
