@@ -26,11 +26,16 @@ export default class EtherbrightPixelDisplay extends Component{
 		return{c1:this.state.pallet[this.state.cnt%6], cnt:prevState.cnt+1};
 
 	}
+	pixelClickHandler=(e,id)=>{
+		console.log("Pix N ",e.target.getAttributeNS(null,"pn"))
+  		console.log("Color ",e.target.getAttributeNS(null,"fill"))
+  		console.log("ID ",e.target.getAttributeNS(null,"id"))
+	}
 
 	getCircle(n,x,y,c){
 
 	    return(
-	      <circle key={n} id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' />
+	      <circle key={n} id={this.state.id.toHexString()} pn={n} cx={x} cy={y} r='20' fill={c} strokeWidth='8' stroke='black' onClick  ={(e) => {this.pixelClickHandler(e,this.state.id);}} />
 	    )
 	}
 	 getSVG(){
@@ -40,7 +45,9 @@ export default class EtherbrightPixelDisplay extends Component{
 	        </svg>
         )
 	 }
-	 animatedSVG(){
+
+
+	 animatedSVG_TEST(){
 	 			// console.log("animate ",this.state.c1);
 	 	// return(
 	  //       <svg width="300" height="300">
@@ -54,22 +61,14 @@ export default class EtherbrightPixelDisplay extends Component{
 	            start={{ c: this.state.c1 }}
 	            enter={{ c: this.state.c1 }}
 	            update={{ c: this.state.c1 }}
-	     //        interpolation ={(begValue, endValue, attr) => { // pass as prop
-				  //   if (attr === 'transform') {
-				  //     return interpolateTransformSvg(begValue, endValue)
-				  //   }
-
-				  //   return interpolate(begValue, endValue)
-				  // }}
-				   // timing={ { duration: 0, delay: 0 }}
-	            duration={0}
-	            delay={0}
-            easing="expOut"
+	            // duration={0}
+	            // delay={0}
+            // easing="linear"
 	          >
 	            {(data) => {
 	            	{/*console.log("DATA ",data.c);*/}
 	            	return(
-	            	<circle cx="50" cy="50" r="20" fill={data.c} strokeWidth='8' stroke='black' />
+	            		<circle cx="50" cy="50" r="20" fill={data.c} strokeWidth='8' stroke='black' />
 	            	)
 	            	}
 	        	}
@@ -82,7 +81,7 @@ export default class EtherbrightPixelDisplay extends Component{
 	render(){
 		return(
 			// this.getSVG()
-			this.animatedSVG()
+			this.animatedSVG_TEST()
 	    )
 	}
 

@@ -16,7 +16,7 @@ var gotPastEvents=false;
 var tickTiming = { duration: 800, ease: d3.easeElasticOut.amplitude(1.5).period(1.5) };
 
 
-function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner, history, mintPix){
+function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner, pixelhistory, mintPix, movie){
   this.id=id;
   this.owner=owner;
   this.svg=svg;
@@ -27,6 +27,7 @@ function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner, history, m
   this.ypos=ypos;
   this.history=history;
   this.mintPix=mintPix;
+  this.movie=[];
 
 }
 function Pixel(id,xpos,ypos,color){
@@ -86,6 +87,8 @@ function generateSvg(id, pixels){
 // console.log("generateSVG  ",header)
 
 }
+
+
 
 // function useTick(delay, initialIndex) {
 //   const [tick, setTick] = useState(initialIndex ? initialIndex : 0);
@@ -310,6 +313,7 @@ class App extends Component {
       returnContractSocket.getPastEvents('EtherbrightPixelChanged', {fromBlock: 0,toBlock: 'latest'},
       (error, events)=>{  history=events; console.log("PixelChangeHistory=",history); gotPastEvents=true; })
       .then((events)=>{
+        
       });
 
       if(returntotalSupply>0){
@@ -347,12 +351,39 @@ class App extends Component {
                   ethb.owner=data[3];
                   // console.log("HISTORY PROM ",data[4])
                   // ethb.history=getHistory(ethb.id);
-                  var pixHist=[];
-                  for(var hist of data[4]){
-                    pixHist.push([hist.returnValues[1].toNumber(),hist.returnValues[2]])
-                  }
-                  ethb.history=pixHist
                   ethb.mintPix=data[5]
+
+                  var pixHist=[];
+                  var fn=0;
+                  // ethb.movie=ethb.mintPix;
+                  ethb.movie[fn]=[...ethb.mintPix];
+                  // console.log("ETHB>mint ",ethb.mintPix)
+                  // console.log("HISTDATA ", data[4])
+                  for(var hist of data[4]){
+                    var pn=hist.returnValues[1].toNumber();
+                    var color=hist.returnValues[3].toString()
+                    pixHist.push([pn,color])
+                    // console.log("fn ",fn)
+                    // console.log("pn ",pn)
+                    // console.log("co ",color)
+                    // console.log("MOV ",ethb.movie)
+
+                    var tmpMovie=[...ethb.movie[fn]]
+                    // console.log("TMP ",tmpMovie)
+                    tmpMovie[pn]=color
+                    // console.log("TMP 2",tmpMovie)
+
+                    ethb.movie.push([...tmpMovie])
+                    // console.log("ID",ethb.id)
+ 
+                    // console.log("MOVIE", ethb.movie)
+
+                    // ethb.movie[fn+1][pn]=color
+                    fn++;
+                  }
+                  console.log("MOVIE", ethb.movie)
+                  ethb.history=pixHist
+                  // this.assignHistory()
                   // console.log("SETTING ETHB HISTORY ",ethb.history)
                   this.setState({
                     etherbrights: [...this.state.etherbrights, ethb]
@@ -362,7 +393,6 @@ class App extends Component {
 
                   // console.log("promis resolved  ", returntotalSupply, " l=",this.state.etherbrights.length)
                   if(this.state.etherbrights.length==returntotalSupply ){
-                 
                     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DONE LOADING")
                         this.setState({loading:false})
                       }
@@ -378,7 +408,18 @@ class App extends Component {
     }
 }
 
+// assignHistory=()=>{
+//   console.log("assignHistory! ",history)
+//   history.forEach(this.addToEtherbrightHistory)
+// }
 
+// addToEtherbrightHistory = (hist)=>{
+//   console.log(hist)
+
+// }
+updateEtherbrightMovie=(pixelChangeEvent) =>{
+
+}
 
 mint = (color) => {
   this.state.contract.methods.mint(color)
