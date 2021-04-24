@@ -30,7 +30,7 @@ function Etherbright(id, xpos,ypos, pixels, pallet, svg, mode, owner, pixelhisto
   this.movie=[];
 
 }
-function Pixel(id,xpos,ypos,color){
+export function Pixel(id,xpos,ypos,color){
   this.id=id;
   this.xpos=xpos;
   this.ypos=ypos;
@@ -381,7 +381,7 @@ class App extends Component {
                     // ethb.movie[fn+1][pn]=color
                     fn++;
                   }
-                  console.log("MOVIE", ethb.movie)
+                  // console.log("MOVIE", ethb.movie)
                   ethb.history=pixHist
                   // this.assignHistory()
                   // console.log("SETTING ETHB HISTORY ",ethb.history)
@@ -558,7 +558,7 @@ render() {
               {this.state.etherbrights.map(ethb => (
                 <div >
                 <hr/>
-                  <EthbDisplay key={ethb.id} id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} pallet={ethb.pallet} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
+                  <EthbDisplay key={ethb.id} id={ethb.id} owner={ethb.owner} pixels={ethb.pixels} pallet={ethb.pallet}  movie={ethb.movie} setmethod={(id,pixn,paln)=>this.setEtherbrightPixelColor(id,pixn,paln)} testsvg={(e,id)=>this.testsvgonclick(e,id)}/>
                 </div>
               ))}
             </div>
@@ -579,6 +579,7 @@ class EthbDisplay extends Component{
       pixels: props.pixels,
       owner: props.owner,
       pallet: props.pallet,
+      movie: props.movie,
     };
     // console.log("ETHBDISP ID",props)
   }
@@ -611,7 +612,8 @@ class EthbDisplay extends Component{
           {this.state.pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
         </svg>
         <div align="left">
-          <EtherbrightPixelDisplay pallet={this.getAllColors()} id={this.state.id} pixels={this.state.pixels} />
+        {/*{console.log("ETHBP DISP "),this.state.movie}*/}
+          <EtherbrightPixelDisplay pallet={this.getAllColors()} id={this.state.id} pixels={this.state.pixels} movie={this.state.movie}/>
 
           <h5>Etherbright id:</h5> <h6> {this.state.id.toHexString()}</h6>
           <br/>

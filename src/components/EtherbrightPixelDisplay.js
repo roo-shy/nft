@@ -2,14 +2,19 @@ import React, { Component } from 'react';
 import { Animate } from 'react-move';
 // import { SvgLoader, SvgProxy } from 'react-svgmt';
 import { interpolate, interpolateTransformSvg } from 'd3-interpolate'
+import {Pixel} from './App.js'
 
 export default class EtherbrightPixelDisplay extends Component{
 	constructor(props){
 		super(props);
+		console.log("MOVIE IN CONST ",props.movie)
 		this.state={
 		pixels: props.pixels,
 		pallet: props.pallet,
+		movie: props.movie,
 		id:props.id,
+		movieFrame:props.movie[0],
+		frameNumber:0,
 		c1:"#00ff00",
 		c2:"#ff00ff",
 		cnt:0,
@@ -20,10 +25,23 @@ export default class EtherbrightPixelDisplay extends Component{
 	    setInterval(() => {
 	      this.setState(this.changecolor);
 	    }, 1000);
+
+	   	setInterval(() => {
+	      this.setState(this.updateMovieFrame);
+	    }, 1000);
 	}
 	changecolor(prevState){
 		// console.log("JUMP ",this.state.c1);
 		return{c1:this.state.pallet[this.state.cnt%6], cnt:prevState.cnt+1};
+
+	}
+	updateMovieFrame(prevState){
+				// console.log(this.state.frameNumber)
+
+		return{
+			movieFrame:this.state.movie[this.state.frameNumber],
+			frameNumber:(prevState.frameNumber+1)%this.state.movie.length
+		}
 
 	}
 	pixelClickHandler=(e,id)=>{
@@ -48,22 +66,12 @@ export default class EtherbrightPixelDisplay extends Component{
 
 
 	 animatedSVG_TEST(){
-	 			// console.log("animate ",this.state.c1);
-	 	// return(
-	  //       <svg width="300" height="300">
-	         
-	  //            <circle cx="50" cy="50" r="20" fill={this.state.c1} strokeWidth='8' stroke='black' />}	          
-	  //       </svg>
- 		// )
 	 	return(
 	        <svg width="300" height="300">
 	          <Animate
 	            start={{ c: this.state.c1 }}
 	            enter={{ c: this.state.c1 }}
 	            update={{ c: this.state.c1 }}
-	            // duration={0}
-	            // delay={0}
-            // easing="linear"
 	          >
 	            {(data) => {
 	            	{/*console.log("DATA ",data.c);*/}
@@ -78,10 +86,33 @@ export default class EtherbrightPixelDisplay extends Component{
  		)
 	 }
 
+	 animatedPxielDisplay(){
+                   var xoff=50;
+        var yoff=50;
+        var p=0;
+        var pixels=[];
+        for(var x=1; x<=5; x++){
+          for(var y=1; y<=5; y++){
+            pixels.push(new Pixel(p,xoff*x,yoff*y,this.state.movie[this.state.frameNumber][p]))
+            p++;
+          }
+        }
+	 	return(
+
+	        <svg width='300' height='300'>
+	          {pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
+	        </svg>
+
+
+	 	)
+	 }
+
 	render(){
 		return(
 			// this.getSVG()
-			this.animatedSVG_TEST()
+			this.animatedPxielDisplay()
+			// this.animatedSVG_TEST()
+
 	    )
 	}
 
