@@ -7,21 +7,25 @@ import {Pixel} from './App.js'
 export default class EtherbrightPixelDisplay extends Component{
 	constructor(props){
 		super(props);
-		console.log("MOVIE IN CONST ",props.movie)
 		this.state={
 		pixels: props.pixels,
 		pallet: props.pallet,
 		movie: props.movie,
 		id:props.id,
-		movieFrame:props.movie[0],
-		frameNumber:0,
+		movieFrame:props.movie[props.movie.length],
+		frameNumber:props.movie.length-1,
+		playing:props.playing,
 		c1:"#00ff00",
 		c2:"#ff00ff",
 		cnt:0,
 		};
+				console.log("PLAYING ",this.state.playing)
+
 	}
 	componentDidMount() {
     //Use React Move to animate the body
+    	 		// this.setState({playing:0})
+
 	    setInterval(() => {
 	      this.setState(this.changecolor);
 	    }, 1000);
@@ -36,11 +40,17 @@ export default class EtherbrightPixelDisplay extends Component{
 
 	}
 	updateMovieFrame(prevState){
-				// console.log(this.state.frameNumber)
-
-		return{
-			movieFrame:this.state.movie[this.state.frameNumber],
-			frameNumber:(prevState.frameNumber+1)%this.state.movie.length
+		// console.log(this.state.frameNumber)
+		if(this.state.playing){
+			return{
+				movieFrame:this.state.movie[this.state.frameNumber],
+				frameNumber:(prevState.frameNumber+1)%this.state.movie.length
+			}
+		}else{
+					return{
+				movieFrame:this.state.movie[this.state.frameNumber],
+				frameNumber:(prevState.frameNumber+0)%this.state.movie.length
+			}	
 		}
 
 	}
@@ -102,18 +112,36 @@ export default class EtherbrightPixelDisplay extends Component{
 	        <svg width='300' height='300'>
 	          {pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
 	        </svg>
-
-
 	 	)
+	 }
+
+	 getPlayButton(){
+	 	return(
+            <button onClick={this.togglePlay}>PLAY</button>
+
+	 		)
+	 }
+	 togglePlay=()=>{
+	 	// return{
+	 		// playing:prevState.playing ? 0:1
+	 		var play=this.state.playing ? 0:1
+	 		this.setState({playing:play})
+	 	// }
+	 	// this.setState
 	 }
 
 	render(){
 		return(
 			// this.getSVG()
-			this.animatedPxielDisplay()
-			// this.animatedSVG_TEST()
+			<div >
+			{this.animatedPxielDisplay()}
+			<div >
+			{this.getPlayButton()}
+			</div>
+			</div>
 
 	    )
+
 	}
 
 

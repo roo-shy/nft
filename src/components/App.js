@@ -249,6 +249,11 @@ class App extends Component {
 
         var _etherbrights = Object.assign(this.state.etherbrights);
         var pixN=event.returnValues[1];
+        var color=event.returnValues[3];
+        _etherbrights[index].history.push([pixN,color]) //adds to its history
+        var tmpMovie=[..._etherbrights[index].movie[_etherbrights[index].movie.length-1]]//last frame of the movie
+        tmpMovie[pixN]=color
+        _etherbrights[index].movie.push([...tmpMovie])
         _etherbrights[index].pixels[pixN].color=event.returnValues[3];
 
         this.setState({etherbrights  :[] });
@@ -608,12 +613,12 @@ class EthbDisplay extends Component{
 
     return(
       <div >
-        <svg width='300' height='300'>
+{/*        <svg width='300' height='300'>
           {this.state.pixels.map(pix=>(this.getCircle(pix.id, pix.xpos, pix.ypos, pix.color) ))}
-        </svg>
+        </svg>*/}
         <div align="left">
         {/*{console.log("ETHBP DISP "),this.state.movie}*/}
-          <EtherbrightPixelDisplay pallet={this.getAllColors()} id={this.state.id} pixels={this.state.pixels} movie={this.state.movie}/>
+          <EtherbrightPixelDisplay playing={0} pallet={this.getAllColors()} id={this.state.id} pixels={this.state.pixels} movie={this.state.movie}/>
 
           <h5>Etherbright id:</h5> <h6> {this.state.id.toHexString()}</h6>
           <br/>
