@@ -45,6 +45,7 @@ https://dashboard.alchemyapi.io/apps/cw5sj9y6sxpkowyb
 
 https://www.geeksforgeeks.org/deploying-smart-contract-on-test-main-network-using-truffle/
 https://faucet.ropsten.be/
+https://faucet.dimensions.network/
 npx truffle migrate --network ropsten
 
 

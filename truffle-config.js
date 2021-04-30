@@ -16,7 +16,7 @@ module.exports = {
       network_id: "5777" // Match any network id
     },
    ropsten: {
-         provider: () => new HDWalletProvider(`apart frequent rabbit leisure credit earth report faint assist defy now fashion`, `wss://ropsten.infura.io/ws/v3/4499efec5f8f4aacaf7988bac139d9d3`),
+         provider: () => new HDWalletProvider(`apart frequent rabbit leisure credit earth report faint assist defy now fashion`, `https://ropsten.infura.io/v3/4499efec5f8f4aacaf7988bac139d9d3`,1),
          network_id: 3,       // Ropsten's id
          gas: 7000000 ,        // Ropsten has a lower block limit than mainnet
          confirmations: 2,    // # of confs to wait between deployments. (default: 0)

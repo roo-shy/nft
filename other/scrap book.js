@@ -9,4 +9,18 @@ this.getCircle(20,20,"#00ff00")
 
 
                             <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
-pi
+                <div dangerouslySetInnerHTML={{__html: this.state.svg }} />
+
+
+
+                          var xoff=50;
+               var yoff=50;
+                var p=0;
+                var pixels=[];
+                for(var x=1; x<=5; x++){
+                  for(var y=1; y<=5; y++){
+                    pixels.push(new Pixel(p,xoff*x,yoff*y,pixelColors[p]))
+                    p++;
+                  }
+                }
+              ethb.pixels=pixels;

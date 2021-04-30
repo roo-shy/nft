@@ -234,7 +234,14 @@ contract Color is ERC721, Ownable {
         return tempUint;
     }
 
-	function setEtherbrightPixel (uint256 _tokenId,uint  _pixn, uint  _palletN ) public {
+    function getBallance() public returns(uint256){
+    	return address(this).balance;
+    }
+
+
+	function setEtherbrightPixel (uint256 _tokenId,uint  _pixn, uint  _palletN ) public payable {
+        require(msg.sender == ownerOf(_tokenId), "You do not have a right to change a pixel color.");
+		require(msg.value == 0.001 ether, "SEND MORE ETH");
 		// Etherbright storage ethb =allEtherbrights[_tokenId];
 		string memory _priorColor=allEtherbrights[_tokenId].setPixels[_pixn];
 		string memory _newColor=allEtherbrights[_tokenId].pallet[_palletN];
@@ -243,6 +250,8 @@ contract Color is ERC721, Ownable {
 		emit EtherbrightPixelChanged(_tokenId, _pixn, _priorColor, _newColor, msg.sender);
 		
 	}
+
+
 	function getEtherbrightPixelColor (uint256 _tokenId,uint pn) public returns(string memory) {
 		return allEtherbrights[_tokenId].setPixels[pn];
 	}
